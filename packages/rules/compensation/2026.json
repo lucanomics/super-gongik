@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.1.0",
+  "schemaVersion": "0.2.0",
   "ruleId": "kr.mma.social-service.compensation",
   "version": "2026",
   "effectiveFrom": "2026-01-01",
@@ -32,7 +32,8 @@
       "publishedDate": "2026-01-05",
       "updatedDate": "2026-03-24",
       "identifier": null,
-      "url": "https://open.mma.go.kr/caisGGGS/board/boardView.do?gesipan_id=16&gsgeul_no=1517395"
+      "url": "https://open.mma.go.kr/caisGGGS/board/boardView.do?gesipan_id=16&gsgeul_no=1517395",
+      "attachmentExtractionStatus": "PENDING_DIRECT_HWPX_EXTRACTION"
     },
     {
       "title": "사회복무요원 복무관리 규정",
@@ -41,69 +42,80 @@
       "effectiveDate": "2026-04-23",
       "identifier": "병무청훈령 제2206호",
       "url": "https://law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000278174&chrClsCd=010201"
+    },
+    {
+      "title": "2026년도 예산안 사회복무요원 중식비 산출자료",
+      "authority": "서울특별시 마포구의회",
+      "sourceType": "OFFICIAL_2026_BUDGET_DOCUMENT",
+      "effectiveDate": "2026-01-01",
+      "identifier": null,
+      "url": "https://council.mapo.seoul.kr/attach/record/MAPO/appendix/a09/A0011050.pdf"
+    },
+    {
+      "title": "2026학년도 학교회계 예산편성 기본지침",
+      "authority": "경기도교육청",
+      "sourceType": "OFFICIAL_2026_ACCOUNTING_GUIDANCE",
+      "effectiveDate": "2026-01-01",
+      "identifier": null,
+      "url": "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/01/963f27ea-ce76-43e1-a1fc-046fa78c3a1d.pdf"
     }
   ],
   "basePay": {
     "status": "VERIFIED",
     "serviceMonthBands": [
-      {
-        "fromServiceMonth": 0,
-        "toServiceMonth": 2,
-        "equivalentRank": "PRIVATE_SECOND_CLASS",
-        "monthlyAmount": 750000
-      },
-      {
-        "fromServiceMonth": 3,
-        "toServiceMonth": 8,
-        "equivalentRank": "PRIVATE_FIRST_CLASS",
-        "monthlyAmount": 900000
-      },
-      {
-        "fromServiceMonth": 9,
-        "toServiceMonth": 14,
-        "equivalentRank": "CORPORAL",
-        "monthlyAmount": 1200000
-      },
-      {
-        "fromServiceMonth": 15,
-        "toServiceMonth": null,
-        "equivalentRank": "SERGEANT",
-        "monthlyAmount": 1500000
-      }
+      {"fromServiceMonth": 0, "toServiceMonth": 2, "equivalentRank": "PRIVATE_SECOND_CLASS", "monthlyAmount": 750000},
+      {"fromServiceMonth": 3, "toServiceMonth": 8, "equivalentRank": "PRIVATE_FIRST_CLASS", "monthlyAmount": 900000},
+      {"fromServiceMonth": 9, "toServiceMonth": 14, "equivalentRank": "CORPORAL", "monthlyAmount": 1200000},
+      {"fromServiceMonth": 15, "toServiceMonth": null, "equivalentRank": "SERGEANT", "monthlyAmount": 1500000}
     ],
     "priorServiceCredit": {
       "status": "VERIFIED_CONTEXTUAL",
       "supportedAutomatically": false,
-      "reason": "Article 62(2) includes special prior-service-credit cases that require profile context and dedicated fixtures."
+      "reason": "Article 62(2) contains prior-service-credit cases that require explicit service-history inputs and dedicated fixtures."
     }
   },
   "meal": {
     "legalBasisStatus": "VERIFIED_CONTEXTUAL",
     "paymentMode": "ACTUAL_EXPENSE",
-    "defaultDailyAmount": null,
-    "defaultAmountStatus": "REQUIRES_SOURCE_TABLE",
-    "requiresCurrentMmaPaymentStandardExtraction": true,
-    "autoCalculateWithoutVerifiedRate": false
+    "suggestedDailyAmount": 9000,
+    "suggestedAmountStatus": "VERIFIED_CONTEXTUAL",
+    "sourceConfidence": "CORROBORATED_BY_MULTIPLE_OFFICIAL_2026_PUBLIC_BUDGET_OR_ACCOUNTING_DOCUMENTS",
+    "directMmaAttachmentExtractionPending": true,
+    "profileConfirmationRequiredBeforeDefinitiveEstimate": true,
+    "autoCalculateAfterProfileConfirmation": true,
+    "warning": "Treat KRW 9,000 as a strongly corroborated 2026 suggested rate until the MMA HWPX attachment is directly extracted and checksummed."
   },
   "transport": {
     "legalBasisStatus": "VERIFIED_CONTEXTUAL",
     "paymentMode": "ACTUAL_EXPENSE",
     "walkingStillUsesPublicTransitFareBasis": true,
-    "defaultDailyAmount": null,
+    "universalDefaultDailyAmount": null,
     "requiredInputs": [
       "commuteFareOrInstitutionApprovedTransportRate",
       "eligibleServiceDays"
     ],
-    "autoCalculateWithoutCommuteInput": false
+    "autoCalculateWithoutCommuteInput": false,
+    "warning": "Do not reuse a single institution's budget fare as a national transport default."
   },
   "proration": {
     "firstAndLastMonth": {
-      "status": "REQUIRES_CURRENT_TEXT_REVALIDATION",
-      "autoCalculate": false
+      "status": "VERIFIED_RULE_STRUCTURE_EXACT_ARITHMETIC_PENDING",
+      "prorationRequired": true,
+      "includeCallUpAndDischargeServiceDays": true,
+      "autoCalculate": false,
+      "reason": "Current rule structure confirms daily proration for partial first/last months, but the exact production arithmetic/divisor should remain disabled until directly pinned to the current text and fixture-tested."
     },
     "nonPayableDays": {
-      "status": "REQUIRES_CURRENT_TEXT_REVALIDATION",
-      "autoCalculate": false
+      "status": "VERIFIED_RULE_STRUCTURE_EXACT_ARITHMETIC_PENDING",
+      "knownCategories": [
+        "SERVICE_INTERRUPTION_OR_SPLIT_SERVICE_NON_SERVICE_PERIOD",
+        "UNAUTHORIZED_ABSENCE",
+        "ABSENCE_EXCEEDING_AVAILABLE_ANNUAL_LEAVE",
+        "NON_DUTY_SICK_LEAVE_EXCEEDING_CUMULATIVE_30_DAYS"
+      ],
+      "dutyRelatedSickLeaveTreatment": "PAYABLE",
+      "autoCalculate": false,
+      "reason": "Eligibility structure is stable in official management rules; exact date accounting remains disabled until current-text fixtures are added."
     }
   },
   "calculationResultRequirements": {
@@ -118,6 +130,8 @@
     "doNotGuessMealRate": true,
     "doNotGuessCommuteFare": true,
     "doNotSilentlyUsePriorYearValues": true,
-    "unsupportedCasesReturnWarning": true
+    "unsupportedCasesReturnWarning": true,
+    "doNotTreatSuggestedMealRateAsInstitutionConfirmed": true,
+    "doNotEnablePartialMonthPayrollUntilFixtureVerified": true
   }
 }

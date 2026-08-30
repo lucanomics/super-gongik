@@ -1,9 +1,9 @@
 {
   "schemaVersion": "0.2.0",
   "ruleId": "kr.mma.social-service.leave",
-  "version": "2026-08-28",
-  "effectiveFrom": "2026-08-28",
-  "effectiveUntil": null,
+  "version": "2026-04-23",
+  "effectiveFrom": "2026-04-23",
+  "effectiveUntil": "2026-08-27",
   "verifiedAt": "2026-08-30",
   "status": "VERIFIED",
   "jurisdiction": "KR",
@@ -12,8 +12,8 @@
       "title": "병역법 시행령 제59조",
       "authority": "대한민국",
       "sourceType": "PRESIDENTIAL_DECREE",
-      "effectiveDate": "2026-08-28",
-      "identifier": "대통령령 제36600호",
+      "effectiveDate": "2025-07-07",
+      "identifier": "대통령령 제35634호",
       "url": "https://www.law.go.kr"
     },
     {
@@ -47,37 +47,7 @@
         "afterFirstYearDays": 13,
         "ordinaryTotalDays": 28,
         "autoCalculate": true
-      },
-      "knownAllocations": [
-        {"mandatoryServiceMonths": 24, "firstYearDays": 15, "afterFirstYearDays": 16, "ordinaryTotalDays": 31, "minimumMonthsInclusive": true},
-        {"mandatoryServiceMonths": 23, "firstYearDays": 15, "afterFirstYearDays": 15, "ordinaryTotalDays": 30},
-        {"mandatoryServiceMonths": 22, "firstYearDays": 15, "afterFirstYearDays": 14, "ordinaryTotalDays": 29},
-        {"mandatoryServiceMonths": 21, "firstYearDays": 15, "afterFirstYearDays": 13, "ordinaryTotalDays": 28},
-        {"mandatoryServiceMonths": 20, "firstYearDays": 15, "afterFirstYearDays": 12, "ordinaryTotalDays": 27},
-        {"mandatoryServiceMonths": 19, "firstYearDays": 15, "afterFirstYearDays": 10, "ordinaryTotalDays": 25},
-        {"mandatoryServiceMonths": 18, "firstYearDays": 15, "afterFirstYearDays": 9, "ordinaryTotalDays": 24},
-        {"mandatoryServiceMonths": 17, "firstYearDays": 15, "afterFirstYearDays": 8, "ordinaryTotalDays": 23},
-        {"mandatoryServiceMonths": 16, "firstYearDays": 15, "afterFirstYearDays": 6, "ordinaryTotalDays": 21},
-        {"mandatoryServiceMonths": 15, "firstYearDays": 15, "afterFirstYearDays": 5, "ordinaryTotalDays": 20},
-        {"mandatoryServiceMonths": 14, "firstYearDays": 15, "afterFirstYearDays": 4, "ordinaryTotalDays": 19},
-        {"mandatoryServiceMonths": 13, "firstYearDays": 15, "afterFirstYearDays": 2, "ordinaryTotalDays": 17},
-        {"mandatoryServiceMonths": 12, "wholeServiceDays": 16},
-        {"mandatoryServiceMonths": 11, "wholeServiceDays": 15},
-        {"mandatoryServiceMonths": 10, "wholeServiceDays": 13},
-        {"mandatoryServiceMonths": 9, "wholeServiceDays": 12},
-        {"mandatoryServiceMonths": 8, "wholeServiceDays": 11},
-        {"mandatoryServiceMonths": 7, "wholeServiceDays": 9},
-        {"mandatoryServiceMonths": 6, "wholeServiceDays": 8},
-        {"mandatoryServiceMonths": 5, "wholeServiceDays": 7},
-        {"mandatoryServiceMonths": 4, "wholeServiceDays": 5},
-        {"mandatoryServiceMonths": 3, "wholeServiceDays": 4}
-      ],
-      "unsupportedDurationsMonths": [1, 2],
-      "unsupportedBehavior": "RETURN_WARNING_NOT_FALLBACK"
-    },
-    "timingAdjustment": {
-      "institutionMayAdjustWithinTotalForUnavoidableReturnToSchoolOrWorkEtc": true,
-      "status": "VERIFIED"
+      }
     },
     "halfDay": {
       "allowed": true,
@@ -135,12 +105,6 @@
       {"code": "SPOUSE_CHILDBIRTH_MULTIPLE", "maxDays": 25, "grantSemantics": "UP_TO"},
       {"code": "SPOUSE_MISCARRIAGE_OR_STILLBIRTH", "maxDays": 3, "grantSemantics": "UP_TO"},
       {
-        "code": "SPOUSE_PREGNANCY_CHECKUP_ACCOMPANIMENT",
-        "maxDays": 10,
-        "grantSemantics": "UP_TO",
-        "effectiveFrom": "2026-08-28"
-      },
-      {
         "code": "CHILD_OR_FAMILY_CARE",
         "maxDaysPerYear": 10,
         "grantSemantics": "UP_TO",
@@ -166,6 +130,12 @@
         "grantSemantics": "UP_TO"
       },
       {"code": "INFERTILITY_TREATMENT_SPERM_COLLECTION", "days": 1, "grantSemantics": "QUALIFYING_EVENT"}
+    ],
+    "excludedBecauseNotYetEffective": [
+      {
+        "code": "SPOUSE_PREGNANCY_CHECKUP_ACCOMPANIMENT",
+        "becomesEffective": "2026-08-28"
+      }
     ]
   },
   "publicLeave": {
@@ -197,6 +167,6 @@
     "retainRuleVersionOnHistoricalEvents": true,
     "neverConvertConditionalMaximumToAutomaticBalance": true,
     "unsupportedCasesReturnWarning": true,
-    "doNotTreatStatutory31DayCapAsStandard21MonthBalance": true
+    "doNotApplyPost20260828PregnancyCheckupLeave": true
   }
 }
