@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "0.2.0",
+  "ruleId": "kr.mma.social-service.leave",
+  "version": "2026-04-23",
+  "effectiveFrom": "2026-04-23",
+  "effectiveUntil": "2026-08-27",
+  "verifiedAt": "2026-08-30",
+  "status": "VERIFIED",
+  "jurisdiction": "KR",
+  "sources": [
+    {
+      "title": "병역법 시행령 제59조",
+      "authority": "대한민국",
+      "sourceType": "PRESIDENTIAL_DECREE",
+      "effectiveDate": "2025-07-07",
+      "identifier": "대통령령 제35634호",
+      "url": "https://www.law.go.kr"
+    },
+    {
+      "title": "병역법 시행규칙 제39조의2 및 별표 1의2",
+      "authority": "국방부",
+      "sourceType": "MINISTERIAL_RULE_AND_SCHEDULE",
+      "effectiveDate": "2026-01-01",
+      "identifier": "국방부령 제1180호",
+      "url": "https://www.law.go.kr/LSW/LsiJoLinkP.do?docType=JO&joNo=002400000&languageType=KO&lsNm=%EB%B3%91%EC%97%AD%EB%B2%95+%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99&paras=1"
+    },
+    {
+      "title": "사회복무요원 복무관리 규정",
+      "authority": "병무청",
+      "sourceType": "ADMINISTRATIVE_RULE",
+      "effectiveDate": "2026-04-23",
+      "identifier": "병무청훈령 제2206호",
+      "url": "https://law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000278174&chrClsCd=010201"
+    }
+  ],
+  "annualLeave": {
+    "statutoryCap": {
+      "maxDays": 31,
+      "status": "VERIFIED",
+      "grantSemantics": "STATUTORY_CAP_NOT_STANDARD_21_MONTH_BALANCE"
+    },
+    "periodAllocation": {
+      "status": "VERIFIED_FOR_LISTED_DURATIONS",
+      "sourceSchedule": "병역법 시행규칙 별표 1의2",
+      "standard21Month": {
+        "firstYearDays": 15,
+        "afterFirstYearDays": 13,
+        "ordinaryTotalDays": 28,
+        "autoCalculate": true
+      }
+    },
+    "halfDay": {
+      "allowed": true,
+      "boundaryTime": "14:00",
+      "twoHalfDaysEqualOneDay": true,
+      "status": "VERIFIED"
+    },
+    "lowSickLeaveBonus": [
+      {
+        "condition": "NO_NON_DUTY_SICK_LEAVE_FROM_CALL_UP_TO_30_DAYS_BEFORE_DISCHARGE_AND_NO_QUALIFYING_DUTY_VIOLATION",
+        "maxAdditionalDays": 5,
+        "grantSemantics": "CONDITIONAL_UP_TO"
+      },
+      {
+        "condition": "NON_DUTY_SICK_LEAVE_TOTAL_AT_MOST_2_DAYS_FROM_CALL_UP_TO_30_DAYS_BEFORE_DISCHARGE_AND_NO_QUALIFYING_DUTY_VIOLATION",
+        "maxAdditionalDays": 2,
+        "grantSemantics": "CONDITIONAL_UP_TO"
+      }
+    ]
+  },
+  "sickLeave": {
+    "approvalRequired": true,
+    "dutyRelated": {
+      "duration": "PERIOD_UNABLE_TO_PERFORM_DUTIES",
+      "servicePeriodTreatment": "COUNTED"
+    },
+    "nonDutyRelated": {
+      "duration": "PERIOD_UNABLE_TO_PERFORM_DUTIES",
+      "servicePeriodTreatment": {
+        "upToTotalDays": 30,
+        "upToThreshold": "COUNTED",
+        "excess": "NOT_COUNTED"
+      }
+    },
+    "evidencePolicy": {
+      "partialDay": {"maxLessThanDays": 1, "required": false},
+      "upToThreeDays": {
+        "acceptedEvidence": ["MEDICAL_TREATMENT_CONFIRMATION", "PRESCRIPTION", "MEDICAL_OPINION"],
+        "noDocumentAllowanceTotalDays": 6
+      },
+      "moreThanThreeDays": {
+        "requiredEvidence": ["MEDICAL_DIAGNOSIS"],
+        "hospitalizationAdditionalEvidence": ["ADMISSION_DISCHARGE_CONFIRMATION"]
+      },
+      "unexpectedIllness": {"mayRequestInitiallyByPhoneOrEquivalent": true}
+    }
+  },
+  "compassionateLeave": {
+    "categories": [
+      {"code": "OWN_MARRIAGE", "maxDays": 5, "grantSemantics": "UP_TO"},
+      {"code": "DEATH_SPOUSE_OR_OWN_OR_SPOUSE_PARENT", "maxDays": 5, "grantSemantics": "UP_TO"},
+      {"code": "DEATH_DIRECT_DESCENDANT_OR_OWN_OR_SPOUSE_GRANDPARENT", "maxDays": 3, "grantSemantics": "UP_TO"},
+      {"code": "DEATH_OWN_OR_SPOUSE_SIBLING", "maxDays": 3, "grantSemantics": "UP_TO"},
+      {"code": "SPOUSE_CHILDBIRTH_SINGLE", "maxDays": 20, "grantSemantics": "UP_TO"},
+      {"code": "SPOUSE_CHILDBIRTH_MULTIPLE", "maxDays": 25, "grantSemantics": "UP_TO"},
+      {"code": "SPOUSE_MISCARRIAGE_OR_STILLBIRTH", "maxDays": 3, "grantSemantics": "UP_TO"},
+      {
+        "code": "CHILD_OR_FAMILY_CARE",
+        "maxDaysPerYear": 10,
+        "grantSemantics": "UP_TO",
+        "eligibleReasons": [
+          "CHILDCARE_OR_SCHOOL_CLOSURE_OR_EQUIVALENT",
+          "CHILDCARE_OR_SCHOOL_OFFICIAL_EVENT_OR_TEACHER_CONSULTATION",
+          "ACCOMPANY_ELIGIBLE_CHILD_FOR_MEDICAL_CARE_CHECKUP_OR_VACCINATION",
+          "CARE_FOR_SPECIFIED_FAMILY_MEMBER_DUE_TO_ILLNESS_ACCIDENT_OR_OLD_AGE"
+        ]
+      },
+      {
+        "code": "CHILDCARE_TIME",
+        "maxMinutesPerDay": 120,
+        "eligibility": "CHILD_AGE_AT_MOST_8_OR_ELEMENTARY_GRADE_AT_MOST_2",
+        "grantSemantics": "DAILY_TIME_ALLOWANCE",
+        "minimumDailyWorkMinutesExcludingChildcareTime": 240
+      },
+      {
+        "code": "DISASTER_DAMAGE",
+        "maxDays": 5,
+        "largeScaleDisasterMaxDays": 10,
+        "largeScaleExtensionRequiresInstitutionRecognition": true,
+        "grantSemantics": "UP_TO"
+      },
+      {"code": "INFERTILITY_TREATMENT_SPERM_COLLECTION", "days": 1, "grantSemantics": "QUALIFYING_EVENT"}
+    ],
+    "excludedBecauseNotYetEffective": [
+      {
+        "code": "SPOUSE_PREGNANCY_CHECKUP_ACCOMPANIMENT",
+        "becomesEffective": "2026-08-28"
+      }
+    ]
+  },
+  "publicLeave": {
+    "balanceBased": false,
+    "duration": "NECESSARY_PERIOD",
+    "reasons": [
+      "SUMMONS_BY_STATE_INSTITUTION_FOR_PUBLIC_DUTY",
+      "STATUTORY_VOTING",
+      "IMPOSSIBLE_ATTENDANCE_DUE_TO_NATURAL_DISASTER_OR_TRANSPORT_INTERRUPTION_OR_SIMILAR_REASON",
+      "MOVE_TO_REDESIGNATED_SERVICE_INSTITUTION",
+      "STATUTORY_HEALTH_EXAMINATION_OR_CHECKUP",
+      "BLOOD_DONATION",
+      "PARTICIPATION_IN_NATIONAL_EVENT",
+      "SPECIFIED_CLASS_1_INFECTIOUS_DISEASE_VACCINATION_OR_TESTING"
+    ]
+  },
+  "specialLeave": {
+    "grantSemantics": "DISCRETIONARY_OR_CONDITIONAL",
+    "categories": [
+      {"code": "EXCEPTIONALLY_EXEMPLARY_PERFORMANCE", "maxDaysPerYear": 5},
+      {"code": "COMMENDATION_FOR_GOOD_DEED_OR_EQUIVALENT", "maxDaysPerYear": 5},
+      {"code": "QUALIFYING_SOCIAL_WELFARE_OR_SPECIAL_EDUCATION_SUPPORT_SERVICE", "maxDaysPerYear": 10},
+      {"code": "SPECIAL_OR_POOR_WORKING_CONDITIONS_CONSOLATION", "maxDaysPerYear": 5}
+    ],
+    "creditOnlyAfterInstitutionGrant": true
+  },
+  "calculationSafety": {
+    "storeDurationsInMinutes": true,
+    "retainRuleVersionOnHistoricalEvents": true,
+    "neverConvertConditionalMaximumToAutomaticBalance": true,
+    "unsupportedCasesReturnWarning": true,
+    "doNotApplyPost20260828PregnancyCheckupLeave": true
+  }
+}
