@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "0.1.0",
+  "ruleId": "kr.mma.social-service.compensation",
+  "version": "2026",
+  "effectiveFrom": "2026-01-01",
+  "effectiveUntil": "2026-12-31",
+  "verifiedAt": "2026-08-30",
+  "status": "VERIFIED_CONTEXTUAL",
+  "jurisdiction": "KR",
+  "currency": "KRW",
+  "sources": [
+    {
+      "title": "병역법 시행령 제62조",
+      "authority": "대한민국",
+      "sourceType": "PRESIDENTIAL_DECREE",
+      "effectiveDate": "2026-08-28",
+      "identifier": "대통령령 제36600호",
+      "url": "https://www.law.go.kr"
+    },
+    {
+      "title": "2026년 군인의 봉급표 [별표 13]",
+      "authority": "인사혁신처",
+      "sourceType": "OFFICIAL_COMPENSATION_TABLE",
+      "effectiveDate": "2026-01-01",
+      "identifier": "공무원보수규정 별표 13",
+      "url": "https://www.mpm.go.kr/mpm/info/resultPay/bizSalary/2026/"
+    },
+    {
+      "title": "2026년도 사회복무요원 보수 등 지급 기준",
+      "authority": "병무청 사회복무국",
+      "sourceType": "OFFICIAL_PAYMENT_GUIDANCE",
+      "publishedDate": "2026-01-05",
+      "updatedDate": "2026-03-24",
+      "identifier": null,
+      "url": "https://open.mma.go.kr/caisGGGS/board/boardView.do?gesipan_id=16&gsgeul_no=1517395"
+    },
+    {
+      "title": "사회복무요원 복무관리 규정",
+      "authority": "병무청",
+      "sourceType": "ADMINISTRATIVE_RULE",
+      "effectiveDate": "2026-04-23",
+      "identifier": "병무청훈령 제2206호",
+      "url": "https://law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000278174&chrClsCd=010201"
+    }
+  ],
+  "basePay": {
+    "status": "VERIFIED",
+    "serviceMonthBands": [
+      {
+        "fromServiceMonth": 0,
+        "toServiceMonth": 2,
+        "equivalentRank": "PRIVATE_SECOND_CLASS",
+        "monthlyAmount": 750000
+      },
+      {
+        "fromServiceMonth": 3,
+        "toServiceMonth": 8,
+        "equivalentRank": "PRIVATE_FIRST_CLASS",
+        "monthlyAmount": 900000
+      },
+      {
+        "fromServiceMonth": 9,
+        "toServiceMonth": 14,
+        "equivalentRank": "CORPORAL",
+        "monthlyAmount": 1200000
+      },
+      {
+        "fromServiceMonth": 15,
+        "toServiceMonth": null,
+        "equivalentRank": "SERGEANT",
+        "monthlyAmount": 1500000
+      }
+    ],
+    "priorServiceCredit": {
+      "status": "VERIFIED_CONTEXTUAL",
+      "supportedAutomatically": false,
+      "reason": "Article 62(2) includes special prior-service-credit cases that require profile context and dedicated fixtures."
+    }
+  },
+  "meal": {
+    "legalBasisStatus": "VERIFIED_CONTEXTUAL",
+    "paymentMode": "ACTUAL_EXPENSE",
+    "defaultDailyAmount": null,
+    "defaultAmountStatus": "REQUIRES_SOURCE_TABLE",
+    "requiresCurrentMmaPaymentStandardExtraction": true,
+    "autoCalculateWithoutVerifiedRate": false
+  },
+  "transport": {
+    "legalBasisStatus": "VERIFIED_CONTEXTUAL",
+    "paymentMode": "ACTUAL_EXPENSE",
+    "walkingStillUsesPublicTransitFareBasis": true,
+    "defaultDailyAmount": null,
+    "requiredInputs": [
+      "commuteFareOrInstitutionApprovedTransportRate",
+      "eligibleServiceDays"
+    ],
+    "autoCalculateWithoutCommuteInput": false
+  },
+  "proration": {
+    "firstAndLastMonth": {
+      "status": "REQUIRES_CURRENT_TEXT_REVALIDATION",
+      "autoCalculate": false
+    },
+    "nonPayableDays": {
+      "status": "REQUIRES_CURRENT_TEXT_REVALIDATION",
+      "autoCalculate": false
+    }
+  },
+  "calculationResultRequirements": {
+    "includeRuleId": true,
+    "includeRuleVersion": true,
+    "includeComponentBreakdown": true,
+    "includeAssumptions": true,
+    "includeWarnings": true,
+    "persistHistoricalSnapshot": true
+  },
+  "calculationSafety": {
+    "doNotGuessMealRate": true,
+    "doNotGuessCommuteFare": true,
+    "doNotSilentlyUsePriorYearValues": true,
+    "unsupportedCasesReturnWarning": true
+  }
+}

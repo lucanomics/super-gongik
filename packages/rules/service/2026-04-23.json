@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "0.1.0",
+  "ruleId": "kr.mma.social-service.service",
+  "version": "2026-04-23",
+  "effectiveFrom": "2026-04-23",
+  "effectiveUntil": null,
+  "verifiedAt": "2026-08-30",
+  "status": "VERIFIED",
+  "jurisdiction": "KR",
+  "sources": [
+    {
+      "title": "사회복무요원 복무관리 규정",
+      "authority": "병무청",
+      "sourceType": "ADMINISTRATIVE_RULE",
+      "effectiveDate": "2026-04-23",
+      "identifier": "병무청훈령 제2206호",
+      "url": "https://law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000278174&chrClsCd=010201"
+    },
+    {
+      "title": "사회복무요원 소집제도",
+      "authority": "병무청",
+      "sourceType": "OFFICIAL_GUIDANCE",
+      "effectiveDate": null,
+      "identifier": null,
+      "url": "https://www.mma.go.kr/contents.do?mc=mma0000741"
+    }
+  ],
+  "serviceDuration": {
+    "months": 21,
+    "calculationMode": "CALENDAR_MONTH_BASED",
+    "militaryTrainingCountsTowardService": true,
+    "allowAuthoritativeDischargeDateOverride": true
+  },
+  "schedule": {
+    "status": "VERIFIED_CONTEXTUAL",
+    "ordinaryScheduleReference": "국가공무원 복무규정 제9조",
+    "institutionSpecificScheduleAllowed": true,
+    "hardCodeDailyMinutes": false,
+    "requiredProfileFields": [
+      "workdayStart",
+      "workdayEnd",
+      "breakMinutes",
+      "workdaysOfWeek"
+    ]
+  },
+  "calculationSafety": {
+    "doNotConvertMonthsToFixedDays": true,
+    "timezone": "Asia/Seoul",
+    "requireExplicitHandlingOfInterruptedOrExtendedService": true
+  }
+}
