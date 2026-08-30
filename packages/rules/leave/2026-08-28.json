@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "0.1.0",
+  "schemaVersion": "0.2.0",
   "ruleId": "kr.mma.social-service.leave",
   "version": "2026-08-28",
   "effectiveFrom": "2026-08-28",
@@ -17,32 +17,73 @@
       "url": "https://www.law.go.kr"
     },
     {
+      "title": "병역법 시행규칙 제39조의2 및 별표 1의2",
+      "authority": "국방부",
+      "sourceType": "MINISTERIAL_RULE_AND_SCHEDULE",
+      "effectiveDate": "2026-01-01",
+      "identifier": "국방부령 제1180호",
+      "url": "https://www.law.go.kr/LSW/LsiJoLinkP.do?docType=JO&joNo=002400000&languageType=KO&lsNm=%EB%B3%91%EC%97%AD%EB%B2%95+%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99&paras=1"
+    },
+    {
       "title": "사회복무요원 복무관리 규정",
       "authority": "병무청",
       "sourceType": "ADMINISTRATIVE_RULE",
       "effectiveDate": "2026-04-23",
       "identifier": "병무청훈령 제2206호",
       "url": "https://law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000278174&chrClsCd=010201"
-    },
-    {
-      "title": "사회복무요원의 복무",
-      "authority": "찾기쉬운 생활법령정보",
-      "sourceType": "AUTHORITATIVE_SECONDARY_GUIDANCE",
-      "effectiveDate": null,
-      "identifier": null,
-      "url": "https://www.easylaw.go.kr/CSP/CnpClsMainBtr.laf?ccfNo=2&cciNo=1&cnpClsNo=2&csmSeq=1464"
     }
   ],
   "annualLeave": {
-    "ordinaryTotal": {
+    "statutoryCap": {
       "maxDays": 31,
       "status": "VERIFIED",
-      "grantSemantics": "STATUTORY_CAP"
+      "grantSemantics": "STATUTORY_CAP_NOT_STANDARD_21_MONTH_BALANCE"
     },
     "periodAllocation": {
-      "status": "REQUIRES_SOURCE_TABLE",
-      "autoCalculate": false,
-      "reason": "Current detailed service-period allocation table must be independently extracted and fixture-tested before production use."
+      "status": "VERIFIED_FOR_LISTED_DURATIONS",
+      "sourceSchedule": "병역법 시행규칙 별표 1의2",
+      "standard21Month": {
+        "firstYearDays": 15,
+        "afterFirstYearDays": 13,
+        "ordinaryTotalDays": 28,
+        "autoCalculate": true
+      },
+      "knownAllocations": [
+        {"mandatoryServiceMonths": 24, "firstYearDays": 15, "afterFirstYearDays": 16, "ordinaryTotalDays": 31, "minimumMonthsInclusive": true},
+        {"mandatoryServiceMonths": 23, "firstYearDays": 15, "afterFirstYearDays": 15, "ordinaryTotalDays": 30},
+        {"mandatoryServiceMonths": 22, "firstYearDays": 15, "afterFirstYearDays": 14, "ordinaryTotalDays": 29},
+        {"mandatoryServiceMonths": 21, "firstYearDays": 15, "afterFirstYearDays": 13, "ordinaryTotalDays": 28},
+        {"mandatoryServiceMonths": 20, "firstYearDays": 15, "afterFirstYearDays": 12, "ordinaryTotalDays": 27},
+        {"mandatoryServiceMonths": 19, "firstYearDays": 15, "afterFirstYearDays": 10, "ordinaryTotalDays": 25},
+        {"mandatoryServiceMonths": 18, "firstYearDays": 15, "afterFirstYearDays": 9, "ordinaryTotalDays": 24},
+        {"mandatoryServiceMonths": 17, "firstYearDays": 15, "afterFirstYearDays": 8, "ordinaryTotalDays": 23},
+        {"mandatoryServiceMonths": 16, "firstYearDays": 15, "afterFirstYearDays": 6, "ordinaryTotalDays": 21},
+        {"mandatoryServiceMonths": 15, "firstYearDays": 15, "afterFirstYearDays": 5, "ordinaryTotalDays": 20},
+        {"mandatoryServiceMonths": 14, "firstYearDays": 15, "afterFirstYearDays": 4, "ordinaryTotalDays": 19},
+        {"mandatoryServiceMonths": 13, "firstYearDays": 15, "afterFirstYearDays": 2, "ordinaryTotalDays": 17},
+        {"mandatoryServiceMonths": 12, "wholeServiceDays": 16},
+        {"mandatoryServiceMonths": 11, "wholeServiceDays": 15},
+        {"mandatoryServiceMonths": 10, "wholeServiceDays": 13},
+        {"mandatoryServiceMonths": 9, "wholeServiceDays": 12},
+        {"mandatoryServiceMonths": 8, "wholeServiceDays": 11},
+        {"mandatoryServiceMonths": 7, "wholeServiceDays": 9},
+        {"mandatoryServiceMonths": 6, "wholeServiceDays": 8},
+        {"mandatoryServiceMonths": 5, "wholeServiceDays": 7},
+        {"mandatoryServiceMonths": 4, "wholeServiceDays": 5},
+        {"mandatoryServiceMonths": 3, "wholeServiceDays": 4}
+      ],
+      "unsupportedDurationsMonths": [1, 2],
+      "unsupportedBehavior": "RETURN_WARNING_NOT_FALLBACK"
+    },
+    "timingAdjustment": {
+      "institutionMayAdjustWithinTotalForUnavoidableReturnToSchoolOrWorkEtc": true,
+      "status": "VERIFIED"
+    },
+    "halfDay": {
+      "allowed": true,
+      "boundaryTime": "14:00",
+      "twoHalfDaysEqualOneDay": true,
+      "status": "VERIFIED"
     },
     "lowSickLeaveBonus": [
       {
@@ -72,67 +113,32 @@
       }
     },
     "evidencePolicy": {
-      "partialDay": {
-        "maxLessThanDays": 1,
-        "required": false
-      },
+      "partialDay": {"maxLessThanDays": 1, "required": false},
       "upToThreeDays": {
-        "acceptedEvidence": [
-          "MEDICAL_TREATMENT_CONFIRMATION",
-          "PRESCRIPTION",
-          "MEDICAL_OPINION"
-        ],
+        "acceptedEvidence": ["MEDICAL_TREATMENT_CONFIRMATION", "PRESCRIPTION", "MEDICAL_OPINION"],
         "noDocumentAllowanceTotalDays": 6
       },
       "moreThanThreeDays": {
-        "requiredEvidence": [
-          "MEDICAL_DIAGNOSIS"
-        ],
-        "hospitalizationAdditionalEvidence": [
-          "ADMISSION_DISCHARGE_CONFIRMATION"
-        ]
+        "requiredEvidence": ["MEDICAL_DIAGNOSIS"],
+        "hospitalizationAdditionalEvidence": ["ADMISSION_DISCHARGE_CONFIRMATION"]
       },
-      "unexpectedIllness": {
-        "mayRequestInitiallyByPhoneOrEquivalent": true
-      }
+      "unexpectedIllness": {"mayRequestInitiallyByPhoneOrEquivalent": true}
     }
   },
   "compassionateLeave": {
     "categories": [
+      {"code": "OWN_MARRIAGE", "maxDays": 5, "grantSemantics": "UP_TO"},
+      {"code": "DEATH_SPOUSE_OR_OWN_OR_SPOUSE_PARENT", "maxDays": 5, "grantSemantics": "UP_TO"},
+      {"code": "DEATH_DIRECT_DESCENDANT_OR_OWN_OR_SPOUSE_GRANDPARENT", "maxDays": 3, "grantSemantics": "UP_TO"},
+      {"code": "DEATH_OWN_OR_SPOUSE_SIBLING", "maxDays": 3, "grantSemantics": "UP_TO"},
+      {"code": "SPOUSE_CHILDBIRTH_SINGLE", "maxDays": 20, "grantSemantics": "UP_TO"},
+      {"code": "SPOUSE_CHILDBIRTH_MULTIPLE", "maxDays": 25, "grantSemantics": "UP_TO"},
+      {"code": "SPOUSE_MISCARRIAGE_OR_STILLBIRTH", "maxDays": 3, "grantSemantics": "UP_TO"},
       {
-        "code": "OWN_MARRIAGE",
-        "maxDays": 5,
-        "grantSemantics": "UP_TO"
-      },
-      {
-        "code": "DEATH_SPOUSE_OR_OWN_OR_SPOUSE_PARENT",
-        "maxDays": 5,
-        "grantSemantics": "UP_TO"
-      },
-      {
-        "code": "DEATH_DIRECT_DESCENDANT_OR_OWN_OR_SPOUSE_GRANDPARENT",
-        "maxDays": 3,
-        "grantSemantics": "UP_TO"
-      },
-      {
-        "code": "DEATH_OWN_OR_SPOUSE_SIBLING",
-        "maxDays": 3,
-        "grantSemantics": "UP_TO"
-      },
-      {
-        "code": "SPOUSE_CHILDBIRTH_SINGLE",
-        "maxDays": 20,
-        "grantSemantics": "UP_TO"
-      },
-      {
-        "code": "SPOUSE_CHILDBIRTH_MULTIPLE",
-        "maxDays": 25,
-        "grantSemantics": "UP_TO"
-      },
-      {
-        "code": "SPOUSE_MISCARRIAGE_OR_STILLBIRTH",
-        "maxDays": 3,
-        "grantSemantics": "UP_TO"
+        "code": "SPOUSE_PREGNANCY_CHECKUP_ACCOMPANIMENT",
+        "maxDays": 10,
+        "grantSemantics": "UP_TO",
+        "effectiveFrom": "2026-08-28"
       },
       {
         "code": "CHILD_OR_FAMILY_CARE",
@@ -159,11 +165,7 @@
         "largeScaleExtensionRequiresInstitutionRecognition": true,
         "grantSemantics": "UP_TO"
       },
-      {
-        "code": "INFERTILITY_TREATMENT_SPERM_COLLECTION",
-        "days": 1,
-        "grantSemantics": "QUALIFYING_EVENT"
-      }
+      {"code": "INFERTILITY_TREATMENT_SPERM_COLLECTION", "days": 1, "grantSemantics": "QUALIFYING_EVENT"}
     ]
   },
   "publicLeave": {
@@ -183,22 +185,10 @@
   "specialLeave": {
     "grantSemantics": "DISCRETIONARY_OR_CONDITIONAL",
     "categories": [
-      {
-        "code": "EXCEPTIONALLY_EXEMPLARY_PERFORMANCE",
-        "maxDaysPerYear": 5
-      },
-      {
-        "code": "COMMENDATION_FOR_GOOD_DEED_OR_EQUIVALENT",
-        "maxDaysPerYear": 5
-      },
-      {
-        "code": "QUALIFYING_SOCIAL_WELFARE_OR_SPECIAL_EDUCATION_SUPPORT_SERVICE",
-        "maxDaysPerYear": 10
-      },
-      {
-        "code": "SPECIAL_OR_POOR_WORKING_CONDITIONS_CONSOLATION",
-        "maxDaysPerYear": 5
-      }
+      {"code": "EXCEPTIONALLY_EXEMPLARY_PERFORMANCE", "maxDaysPerYear": 5},
+      {"code": "COMMENDATION_FOR_GOOD_DEED_OR_EQUIVALENT", "maxDaysPerYear": 5},
+      {"code": "QUALIFYING_SOCIAL_WELFARE_OR_SPECIAL_EDUCATION_SUPPORT_SERVICE", "maxDaysPerYear": 10},
+      {"code": "SPECIAL_OR_POOR_WORKING_CONDITIONS_CONSOLATION", "maxDaysPerYear": 5}
     ],
     "creditOnlyAfterInstitutionGrant": true
   },
@@ -206,6 +196,7 @@
     "storeDurationsInMinutes": true,
     "retainRuleVersionOnHistoricalEvents": true,
     "neverConvertConditionalMaximumToAutomaticBalance": true,
-    "unsupportedCasesReturnWarning": true
+    "unsupportedCasesReturnWarning": true,
+    "doNotTreatStatutory31DayCapAsStandard21MonthBalance": true
   }
 }
