@@ -63,10 +63,30 @@
   "basePay": {
     "status": "VERIFIED",
     "serviceMonthBands": [
-      {"fromServiceMonth": 0, "toServiceMonth": 2, "equivalentRank": "PRIVATE_SECOND_CLASS", "monthlyAmount": 750000},
-      {"fromServiceMonth": 3, "toServiceMonth": 8, "equivalentRank": "PRIVATE_FIRST_CLASS", "monthlyAmount": 900000},
-      {"fromServiceMonth": 9, "toServiceMonth": 14, "equivalentRank": "CORPORAL", "monthlyAmount": 1200000},
-      {"fromServiceMonth": 15, "toServiceMonth": null, "equivalentRank": "SERGEANT", "monthlyAmount": 1500000}
+      {
+        "fromServiceMonth": 0,
+        "toServiceMonth": 2,
+        "equivalentRank": "PRIVATE_SECOND_CLASS",
+        "monthlyAmount": 750000
+      },
+      {
+        "fromServiceMonth": 3,
+        "toServiceMonth": 8,
+        "equivalentRank": "PRIVATE_FIRST_CLASS",
+        "monthlyAmount": 900000
+      },
+      {
+        "fromServiceMonth": 9,
+        "toServiceMonth": 14,
+        "equivalentRank": "CORPORAL",
+        "monthlyAmount": 1200000
+      },
+      {
+        "fromServiceMonth": 15,
+        "toServiceMonth": null,
+        "equivalentRank": "SERGEANT",
+        "monthlyAmount": 1500000
+      }
     ],
     "priorServiceCredit": {
       "status": "VERIFIED_CONTEXTUAL",

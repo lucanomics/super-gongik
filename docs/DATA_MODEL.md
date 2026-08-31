@@ -1,6 +1,7 @@
 # SUPER GONGIK Data Model
 
 ## 1. Design principles
+
 - Store canonical facts once.
 - Derive dashboards and summaries from canonical records.
 - Represent time internally in minutes where duration matters.
@@ -10,9 +11,11 @@
 ## 2. Core entities
 
 ### service_profile
+
 Represents one user's service context.
 
 Fields:
+
 - id
 - owner_id nullable for guest mode
 - local_profile_id
@@ -27,9 +30,11 @@ Fields:
 - updated_at
 
 ### service_event
+
 Canonical timeline record.
 
 Fields:
+
 - id
 - service_profile_id
 - event_type
@@ -48,6 +53,7 @@ Fields:
 - device_id
 
 Initial `event_type` values:
+
 - WORKDAY_OVERRIDE
 - ANNUAL_LEAVE
 - SICK_LEAVE
@@ -63,9 +69,11 @@ Initial `event_type` values:
 - USER_NOTE
 
 ### leave_account
+
 Stores a logical leave bucket, not every derived balance.
 
 Fields:
+
 - id
 - service_profile_id
 - leave_type
@@ -74,9 +82,11 @@ Fields:
 - created_at
 
 ### leave_credit
+
 Represents leave granted or adjusted.
 
 Fields:
+
 - id
 - leave_account_id
 - granted_at
@@ -90,9 +100,11 @@ Fields:
 Leave usage should generally be derived from `service_event` rather than duplicated here.
 
 ### compensation_period
+
 Represents a monthly compensation projection or recorded actual payment.
 
 Fields:
+
 - id
 - service_profile_id
 - year
@@ -108,9 +120,11 @@ Fields:
 - updated_at
 
 ### policy_rule
+
 Metadata for versioned rules.
 
 Fields:
+
 - id
 - domain: SERVICE | LEAVE | COMPENSATION
 - version
@@ -125,9 +139,11 @@ Fields:
 - created_at
 
 ### sync_state
+
 Tracks device synchronization.
 
 Fields:
+
 - id
 - service_profile_id
 - device_id
@@ -155,6 +171,7 @@ policy_rule
 ```
 
 ## 4. Leave balance derivation
+
 For a leave account:
 
 ```text
@@ -166,16 +183,20 @@ balance_minutes
 Presentation in days/hours is derived from active policy and context. Do not store a floating-point `days_remaining` as the source of truth.
 
 ## 5. Event duration rules
+
 If an event has explicit `duration_minutes`, use it after validation.
 If it has `starts_at` and `ends_at`, derive duration according to policy/business-hours rules.
 If it is all-day leave, derive the charge from the applicable rule version rather than assuming 480 minutes globally.
 
 ## 6. Soft deletion
+
 Use `deleted_at` for user records that may need sync recovery.
 Hard deletion is reserved for account purge/export-complete privacy operations.
 
 ## 7. Historical integrity
+
 When an estimate is generated, persist:
+
 - rule identifier
 - rule version
 - relevant input snapshot
@@ -184,14 +205,18 @@ When an estimate is generated, persist:
 Do not silently recalculate old periods with new policy rules unless the user explicitly requests a refreshed estimate.
 
 ## 8. Privacy minimization
+
 Do not store by default:
+
 - resident registration number
 - detailed medical diagnosis
 - unrelated workplace personnel data
 - exact workplace address unless a future feature requires it and the user opts in
 
 ## 9. Export model
+
 JSON export should include:
+
 - schema_version
 - exported_at
 - service_profile

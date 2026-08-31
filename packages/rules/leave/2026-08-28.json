@@ -49,28 +49,89 @@
         "autoCalculate": true
       },
       "knownAllocations": [
-        {"mandatoryServiceMonths": 24, "firstYearDays": 15, "afterFirstYearDays": 16, "ordinaryTotalDays": 31, "minimumMonthsInclusive": true},
-        {"mandatoryServiceMonths": 23, "firstYearDays": 15, "afterFirstYearDays": 15, "ordinaryTotalDays": 30},
-        {"mandatoryServiceMonths": 22, "firstYearDays": 15, "afterFirstYearDays": 14, "ordinaryTotalDays": 29},
-        {"mandatoryServiceMonths": 21, "firstYearDays": 15, "afterFirstYearDays": 13, "ordinaryTotalDays": 28},
-        {"mandatoryServiceMonths": 20, "firstYearDays": 15, "afterFirstYearDays": 12, "ordinaryTotalDays": 27},
-        {"mandatoryServiceMonths": 19, "firstYearDays": 15, "afterFirstYearDays": 10, "ordinaryTotalDays": 25},
-        {"mandatoryServiceMonths": 18, "firstYearDays": 15, "afterFirstYearDays": 9, "ordinaryTotalDays": 24},
-        {"mandatoryServiceMonths": 17, "firstYearDays": 15, "afterFirstYearDays": 8, "ordinaryTotalDays": 23},
-        {"mandatoryServiceMonths": 16, "firstYearDays": 15, "afterFirstYearDays": 6, "ordinaryTotalDays": 21},
-        {"mandatoryServiceMonths": 15, "firstYearDays": 15, "afterFirstYearDays": 5, "ordinaryTotalDays": 20},
-        {"mandatoryServiceMonths": 14, "firstYearDays": 15, "afterFirstYearDays": 4, "ordinaryTotalDays": 19},
-        {"mandatoryServiceMonths": 13, "firstYearDays": 15, "afterFirstYearDays": 2, "ordinaryTotalDays": 17},
-        {"mandatoryServiceMonths": 12, "wholeServiceDays": 16},
-        {"mandatoryServiceMonths": 11, "wholeServiceDays": 15},
-        {"mandatoryServiceMonths": 10, "wholeServiceDays": 13},
-        {"mandatoryServiceMonths": 9, "wholeServiceDays": 12},
-        {"mandatoryServiceMonths": 8, "wholeServiceDays": 11},
-        {"mandatoryServiceMonths": 7, "wholeServiceDays": 9},
-        {"mandatoryServiceMonths": 6, "wholeServiceDays": 8},
-        {"mandatoryServiceMonths": 5, "wholeServiceDays": 7},
-        {"mandatoryServiceMonths": 4, "wholeServiceDays": 5},
-        {"mandatoryServiceMonths": 3, "wholeServiceDays": 4}
+        {
+          "mandatoryServiceMonths": 24,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 16,
+          "ordinaryTotalDays": 31,
+          "minimumMonthsInclusive": true
+        },
+        {
+          "mandatoryServiceMonths": 23,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 15,
+          "ordinaryTotalDays": 30
+        },
+        {
+          "mandatoryServiceMonths": 22,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 14,
+          "ordinaryTotalDays": 29
+        },
+        {
+          "mandatoryServiceMonths": 21,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 13,
+          "ordinaryTotalDays": 28
+        },
+        {
+          "mandatoryServiceMonths": 20,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 12,
+          "ordinaryTotalDays": 27
+        },
+        {
+          "mandatoryServiceMonths": 19,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 10,
+          "ordinaryTotalDays": 25
+        },
+        {
+          "mandatoryServiceMonths": 18,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 9,
+          "ordinaryTotalDays": 24
+        },
+        {
+          "mandatoryServiceMonths": 17,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 8,
+          "ordinaryTotalDays": 23
+        },
+        {
+          "mandatoryServiceMonths": 16,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 6,
+          "ordinaryTotalDays": 21
+        },
+        {
+          "mandatoryServiceMonths": 15,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 5,
+          "ordinaryTotalDays": 20
+        },
+        {
+          "mandatoryServiceMonths": 14,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 4,
+          "ordinaryTotalDays": 19
+        },
+        {
+          "mandatoryServiceMonths": 13,
+          "firstYearDays": 15,
+          "afterFirstYearDays": 2,
+          "ordinaryTotalDays": 17
+        },
+        { "mandatoryServiceMonths": 12, "wholeServiceDays": 16 },
+        { "mandatoryServiceMonths": 11, "wholeServiceDays": 15 },
+        { "mandatoryServiceMonths": 10, "wholeServiceDays": 13 },
+        { "mandatoryServiceMonths": 9, "wholeServiceDays": 12 },
+        { "mandatoryServiceMonths": 8, "wholeServiceDays": 11 },
+        { "mandatoryServiceMonths": 7, "wholeServiceDays": 9 },
+        { "mandatoryServiceMonths": 6, "wholeServiceDays": 8 },
+        { "mandatoryServiceMonths": 5, "wholeServiceDays": 7 },
+        { "mandatoryServiceMonths": 4, "wholeServiceDays": 5 },
+        { "mandatoryServiceMonths": 3, "wholeServiceDays": 4 }
       ],
       "unsupportedDurationsMonths": [1, 2],
       "unsupportedBehavior": "RETURN_WARNING_NOT_FALLBACK"
@@ -113,27 +174,57 @@
       }
     },
     "evidencePolicy": {
-      "partialDay": {"maxLessThanDays": 1, "required": false},
+      "partialDay": { "maxLessThanDays": 1, "required": false },
       "upToThreeDays": {
-        "acceptedEvidence": ["MEDICAL_TREATMENT_CONFIRMATION", "PRESCRIPTION", "MEDICAL_OPINION"],
+        "acceptedEvidence": [
+          "MEDICAL_TREATMENT_CONFIRMATION",
+          "PRESCRIPTION",
+          "MEDICAL_OPINION"
+        ],
         "noDocumentAllowanceTotalDays": 6
       },
       "moreThanThreeDays": {
         "requiredEvidence": ["MEDICAL_DIAGNOSIS"],
-        "hospitalizationAdditionalEvidence": ["ADMISSION_DISCHARGE_CONFIRMATION"]
+        "hospitalizationAdditionalEvidence": [
+          "ADMISSION_DISCHARGE_CONFIRMATION"
+        ]
       },
-      "unexpectedIllness": {"mayRequestInitiallyByPhoneOrEquivalent": true}
+      "unexpectedIllness": { "mayRequestInitiallyByPhoneOrEquivalent": true }
     }
   },
   "compassionateLeave": {
     "categories": [
-      {"code": "OWN_MARRIAGE", "maxDays": 5, "grantSemantics": "UP_TO"},
-      {"code": "DEATH_SPOUSE_OR_OWN_OR_SPOUSE_PARENT", "maxDays": 5, "grantSemantics": "UP_TO"},
-      {"code": "DEATH_DIRECT_DESCENDANT_OR_OWN_OR_SPOUSE_GRANDPARENT", "maxDays": 3, "grantSemantics": "UP_TO"},
-      {"code": "DEATH_OWN_OR_SPOUSE_SIBLING", "maxDays": 3, "grantSemantics": "UP_TO"},
-      {"code": "SPOUSE_CHILDBIRTH_SINGLE", "maxDays": 20, "grantSemantics": "UP_TO"},
-      {"code": "SPOUSE_CHILDBIRTH_MULTIPLE", "maxDays": 25, "grantSemantics": "UP_TO"},
-      {"code": "SPOUSE_MISCARRIAGE_OR_STILLBIRTH", "maxDays": 3, "grantSemantics": "UP_TO"},
+      { "code": "OWN_MARRIAGE", "maxDays": 5, "grantSemantics": "UP_TO" },
+      {
+        "code": "DEATH_SPOUSE_OR_OWN_OR_SPOUSE_PARENT",
+        "maxDays": 5,
+        "grantSemantics": "UP_TO"
+      },
+      {
+        "code": "DEATH_DIRECT_DESCENDANT_OR_OWN_OR_SPOUSE_GRANDPARENT",
+        "maxDays": 3,
+        "grantSemantics": "UP_TO"
+      },
+      {
+        "code": "DEATH_OWN_OR_SPOUSE_SIBLING",
+        "maxDays": 3,
+        "grantSemantics": "UP_TO"
+      },
+      {
+        "code": "SPOUSE_CHILDBIRTH_SINGLE",
+        "maxDays": 20,
+        "grantSemantics": "UP_TO"
+      },
+      {
+        "code": "SPOUSE_CHILDBIRTH_MULTIPLE",
+        "maxDays": 25,
+        "grantSemantics": "UP_TO"
+      },
+      {
+        "code": "SPOUSE_MISCARRIAGE_OR_STILLBIRTH",
+        "maxDays": 3,
+        "grantSemantics": "UP_TO"
+      },
       {
         "code": "SPOUSE_PREGNANCY_CHECKUP_ACCOMPANIMENT",
         "maxDays": 10,
@@ -165,7 +256,11 @@
         "largeScaleExtensionRequiresInstitutionRecognition": true,
         "grantSemantics": "UP_TO"
       },
-      {"code": "INFERTILITY_TREATMENT_SPERM_COLLECTION", "days": 1, "grantSemantics": "QUALIFYING_EVENT"}
+      {
+        "code": "INFERTILITY_TREATMENT_SPERM_COLLECTION",
+        "days": 1,
+        "grantSemantics": "QUALIFYING_EVENT"
+      }
     ]
   },
   "publicLeave": {
@@ -185,10 +280,19 @@
   "specialLeave": {
     "grantSemantics": "DISCRETIONARY_OR_CONDITIONAL",
     "categories": [
-      {"code": "EXCEPTIONALLY_EXEMPLARY_PERFORMANCE", "maxDaysPerYear": 5},
-      {"code": "COMMENDATION_FOR_GOOD_DEED_OR_EQUIVALENT", "maxDaysPerYear": 5},
-      {"code": "QUALIFYING_SOCIAL_WELFARE_OR_SPECIAL_EDUCATION_SUPPORT_SERVICE", "maxDaysPerYear": 10},
-      {"code": "SPECIAL_OR_POOR_WORKING_CONDITIONS_CONSOLATION", "maxDaysPerYear": 5}
+      { "code": "EXCEPTIONALLY_EXEMPLARY_PERFORMANCE", "maxDaysPerYear": 5 },
+      {
+        "code": "COMMENDATION_FOR_GOOD_DEED_OR_EQUIVALENT",
+        "maxDaysPerYear": 5
+      },
+      {
+        "code": "QUALIFYING_SOCIAL_WELFARE_OR_SPECIAL_EDUCATION_SUPPORT_SERVICE",
+        "maxDaysPerYear": 10
+      },
+      {
+        "code": "SPECIAL_OR_POOR_WORKING_CONDITIONS_CONSOLATION",
+        "maxDaysPerYear": 5
+      }
     ],
     "creditOnlyAfterInstitutionGrant": true
   },
