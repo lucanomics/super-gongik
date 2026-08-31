@@ -1,0 +1,18 @@
+# Foundation implementation notes
+
+## Implemented boundaries
+
+- `packages/domain` owns deterministic Seoul civil-date handling, the guest service profile, 21-calendar-month discharge-date derivation, D-Day, and progress.
+- `packages/rules` parses the source-derived JSON bundles, selects a single effective rule version, and returns an explainable calculation contract and replayable snapshot.
+- `apps/web` is a guest-first Next.js PWA shell. It stores only the profile in local storage and never places policy logic in React components.
+
+## Safety gates retained by design
+
+- The 2026 meal rate of KRW 9,000 is surfaced only as a suggested value until the profile has confirmation context.
+- Transport requires a user-entered fare or institution-approved transport rate.
+- Partial service months and prior-service credit return a gated result rather than a guessed amount.
+- Missing, ambiguous, or out-of-range effective-date rules return an explicit unsupported result; selection never falls back to a newer or older bundle.
+
+## Verification
+
+`packages/rules/fixtures/2026-boundaries.json` is executed directly by the rules test suite. The test cases cover the 2026-08-27/28 leave boundary, ordinary leave at 21 months, compensation pay-band boundaries, suggested meal status, transport context, and automatic-calculation gates.
