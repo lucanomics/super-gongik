@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "./service-app.css";
+
+:root {
+  --navy: #071a3d;
+  --navy-muted: #49607f;
+  --teal: #00a68f;
+  --teal-deep: #008d7a;
+  --teal-pale: #e5f8f4;
+  --line: #d8e0ec;
+  --line-strong: #afbed2;
+  --surface: #ffffff;
+  --surface-muted: #f7fafc;
+  --danger: #bd2c41;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--surface-muted);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--surface-muted);
+  color: var(--navy);
+  font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--teal) 35%, transparent);
+  outline-offset: 2px;
+}

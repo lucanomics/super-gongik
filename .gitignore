@@ -1,0 +1,16 @@
+node_modules/
+**/.node_modules.offloaded/
+.pnpm-lock.offloaded.yaml
+.pnpm-store/
+.next/
+out/
+build/
+coverage/
+.vercel/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+.DS_Store
+playwright-report/
+test-results/
