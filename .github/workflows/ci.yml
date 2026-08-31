@@ -8,7 +8,7 @@ on:
       - "feat/**"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -28,19 +28,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
-      - name: Apply formatting
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: pnpm format
-      - name: Commit formatting
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          if ! git diff --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "style: apply Prettier formatting"
-            git push
-          fi
       - name: Check formatting
         run: pnpm format:check
       - name: Typecheck
