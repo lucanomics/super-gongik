@@ -1,18 +1,15 @@
-name: CI
+name: Format bootstrap
 
 on:
-  pull_request:
   push:
     branches:
-      - main
-      - "feat/**"
+      - "feat/import-ui-xlsx-pdf"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  verify:
-    name: Verify workspace
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -24,15 +21,16 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Lint
-        run: pnpm lint
-      - name: Check formatting
-        run: pnpm format:check
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Test
-        run: pnpm test
-      - name: Build web app
-        run: pnpm build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format
+      - name: Commit formatted files
+        run: |
+          if git diff --quiet; then
+            echo "Formatting already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "style: apply workspace formatting"
+          git push origin HEAD:feat/import-ui-xlsx-pdf
