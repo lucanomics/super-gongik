@@ -112,8 +112,10 @@ function chooseExcelTable(worksheets: Worksheet[]) {
 export async function parseXlsxFile(file: File): Promise<TabularAdapterResult> {
   const { Workbook } = await import("exceljs");
   const workbook = new Workbook();
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  await workbook.xlsx.load(bytes as unknown as Buffer);
+  const buffer = (await file.arrayBuffer()) as unknown as Parameters<
+    typeof workbook.xlsx.load
+  >[0];
+  await workbook.xlsx.load(buffer);
 
   const table = chooseExcelTable(workbook.worksheets);
   if (!table || table.score < 2) {
@@ -244,7 +246,6 @@ export async function parsePdfFile(file: File): Promise<TabularAdapterResult> {
 
   const task = pdfjs.getDocument({
     data: new Uint8Array(await file.arrayBuffer()),
-    isEvalSupported: false,
   });
   const document = await task.promise;
   const items: PositionedPdfText[] = [];
