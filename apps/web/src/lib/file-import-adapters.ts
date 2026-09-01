@@ -183,6 +183,23 @@ function headerScore(row: PdfRow) {
   return mapColumns(row.cells.map((item) => item.text.trim())).length;
 }
 
+function normalizePdfHeaderText(value: string) {
+  return value.normalize("NFKC").trim().toLowerCase().replace(/\s+/g, "");
+}
+
+function isRepeatedPdfHeader(
+  row: PdfRow,
+  headerCells: PositionedPdfText[],
+) {
+  const headerLabels = new Set(
+    headerCells.map((cell) => normalizePdfHeaderText(cell.text)),
+  );
+  const matches = row.cells.filter((cell) =>
+    headerLabels.has(normalizePdfHeaderText(cell.text)),
+  ).length;
+  return matches >= Math.max(2, Math.ceil(headerCells.length * 0.6));
+}
+
 export function tabularFromPositionedPdfText(
   items: PositionedPdfText[],
 ): TabularAdapterResult {
@@ -207,7 +224,7 @@ export function tabularFromPositionedPdfText(
 
   const tableRows: TabularRow[] = [];
   for (const row of rows.slice(header.index + 1)) {
-    if (headerScore(row) >= 2) continue;
+    if (isRepeatedPdfHeader(row, headerCells)) continue;
     const buckets = headers.map(() => [] as string[]);
 
     for (const item of row.cells) {
