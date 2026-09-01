@@ -17,7 +17,13 @@ export type CanonicalColumn =
   | "remaining"
   | "asOfDate";
 
-export type TabularCell = string | number | boolean | Date | null | undefined;
+export type TabularCell =
+  | string
+  | number
+  | boolean
+  | Date
+  | null
+  | undefined;
 export type TabularRow = Record<string, TabularCell>;
 
 export type ImportableServiceEventType =
