@@ -1,0 +1,96 @@
+import type {
+  ImportWarning,
+  ImportableServiceEventType,
+} from "./types";
+
+const EVENT_TYPE_SYNONYMS: Array<{
+  type: ImportableServiceEventType;
+  labels: string[];
+}> = [
+  {
+    type: "ANNUAL_LEAVE",
+    labels: ["연가", "연차", "반가", "오전반가", "오후반가", "annualleave"],
+  },
+  { type: "SICK_LEAVE", labels: ["병가", "질병휴가", "sickleave"] },
+  { type: "OFFICIAL_LEAVE", labels: ["공가", "officialleave"] },
+  {
+    type: "SPECIAL_LEAVE",
+    labels: ["특별휴가", "특휴", "포상휴가", "specialleave"],
+  },
+  {
+    type: "COMPASSIONATE_LEAVE",
+    labels: ["청원휴가", "경조휴가", "가족돌봄휴가", "compassionateleave"],
+  },
+  { type: "OUTING", labels: ["외출", "개인외출", "outing"] },
+  { type: "LATE_ARRIVAL", labels: ["지각", "late", "latearrival"] },
+  { type: "EARLY_LEAVE", labels: ["조퇴", "earlyleave"] },
+  {
+    type: "EDUCATION",
+    labels: ["교육", "복무기본교육", "직무교육", "education"],
+  },
+  {
+    type: "TRAINING",
+    labels: ["훈련", "훈련소", "군사교육", "군사교육소집", "training"],
+  },
+];
+
+function normalizeLabel(value: string) {
+  return value
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_\-./()[\]{}:]+/g, "");
+}
+
+export function classifyEventType(value: unknown): {
+  eventType: ImportableServiceEventType | null;
+  confidence: number;
+  warnings: ImportWarning[];
+  halfDayHint: boolean;
+} {
+  const source = typeof value === "string" ? normalizeLabel(value) : "";
+  if (!source) {
+    return {
+      eventType: null,
+      confidence: 0,
+      warnings: [
+        { code: "MISSING_EVENT_TYPE", message: "복무/휴가 종류가 비어 있습니다." },
+      ],
+      halfDayHint: false,
+    };
+  }
+
+  for (const candidate of EVENT_TYPE_SYNONYMS) {
+    for (const label of candidate.labels) {
+      const normalized = normalizeLabel(label);
+      if (source === normalized) {
+        return {
+          eventType: candidate.type,
+          confidence: 1,
+          warnings: [],
+          halfDayHint: source.includes("반가"),
+        };
+      }
+      if (source.includes(normalized) || normalized.includes(source)) {
+        return {
+          eventType: candidate.type,
+          confidence: 0.86,
+          warnings: [],
+          halfDayHint: source.includes("반가"),
+        };
+      }
+    }
+  }
+
+  return {
+    eventType: null,
+    confidence: 0.35,
+    warnings: [
+      {
+        code: "UNRECOGNIZED_EVENT_TYPE",
+        message: `복무/휴가 종류 '${String(value)}'를 자동 분류하지 못했습니다.`,
+      },
+    ],
+    halfDayHint: false,
+  };
+}
