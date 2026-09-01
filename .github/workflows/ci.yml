@@ -28,11 +28,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm lint
-      - name: Prettier diagnostic
-        run: |
-          pnpm format
-          git diff -- apps/web/src/env.ts packages/importer
-          exit 1
+      - name: Check formatting
+        run: pnpm format:check
       - name: Typecheck
         run: pnpm typecheck
       - name: Test
