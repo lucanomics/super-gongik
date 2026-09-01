@@ -38,32 +38,9 @@ const HEADER_SYNONYMS: Record<CanonicalColumn, string[]> = {
     "hours",
     "minutes",
   ],
-  startTime: [
-    "시작",
-    "시작시간",
-    "시각부터",
-    "from",
-    "start",
-    "starttime",
-  ],
-  endTime: [
-    "종료",
-    "종료시간",
-    "시각까지",
-    "to",
-    "end",
-    "endtime",
-  ],
-  note: [
-    "비고",
-    "사유",
-    "메모",
-    "내용",
-    "remark",
-    "remarks",
-    "note",
-    "memo",
-  ],
+  startTime: ["시작", "시작시간", "시각부터", "from", "start", "starttime"],
+  endTime: ["종료", "종료시간", "시각까지", "to", "end", "endtime"],
+  note: ["비고", "사유", "메모", "내용", "remark", "remarks", "note", "memo"],
   granted: [
     "부여",
     "부여량",
@@ -149,7 +126,8 @@ export function mapColumns(headers: string[]): ColumnMapping[] {
       return true;
     })
     .sort(
-      (a, b) => headers.indexOf(a.sourceHeader) - headers.indexOf(b.sourceHeader),
+      (a, b) =>
+        headers.indexOf(a.sourceHeader) - headers.indexOf(b.sourceHeader),
     );
 }
 
