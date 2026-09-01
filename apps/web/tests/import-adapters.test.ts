@@ -8,9 +8,9 @@ import {
 
 describe("file format detection", () => {
   it("recognizes HWP and HWPX sources", () => {
-    expect(formatFromFile({ name: "근태대장.hwp", type: "application/x-hwp" })).toBe(
-      "HWP",
-    );
+    expect(
+      formatFromFile({ name: "근태대장.hwp", type: "application/x-hwp" }),
+    ).toBe("HWP");
     expect(formatFromFile({ name: "휴가현황.hwpx", type: "" })).toBe("HWPX");
   });
 });

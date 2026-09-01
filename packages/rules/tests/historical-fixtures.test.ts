@@ -6,11 +6,14 @@ import { LEAVE_RULE_BUNDLES } from "../src/bundles";
 describe("historical annual leave references", () => {
   it("preserves the 2011 HWP table without enabling it as a production rule", () => {
     expect(historicalAnnualLeave.productionSelectable).toBe(false);
-    expect(historicalAnnualLeave.requiresPrimarySourceReverification).toBe(true);
+    expect(historicalAnnualLeave.requiresPrimarySourceReverification).toBe(
+      true,
+    );
     expect(historicalAnnualLeave.effectiveFromReference).toBe("2011-01-01");
     expect(
       LEAVE_RULE_BUNDLES.some(
-        (bundle) => bundle.version === historicalAnnualLeave.effectiveFromReference,
+        (bundle) =>
+          bundle.version === historicalAnnualLeave.effectiveFromReference,
       ),
     ).toBe(false);
   });

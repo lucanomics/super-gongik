@@ -116,9 +116,7 @@ export async function buildImportPreview(
       !candidate.eventType ||
       candidate.confidence < 0.7 ||
       candidate.warnings.some((warning) =>
-        ["AMBIGUOUS_HALF_DAY", "AMBIGUOUS_DAY_FRACTION"].includes(
-          warning.code,
-        ),
+        ["AMBIGUOUS_HALF_DAY", "AMBIGUOUS_DAY_FRACTION"].includes(warning.code),
       )
     ) {
       unresolvedRowIndexes.push(sourceRowIndex);

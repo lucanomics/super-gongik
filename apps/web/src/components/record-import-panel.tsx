@@ -219,9 +219,7 @@ export function RecordImportPanel({
       setStatus("IDLE");
       setOcrProgress(null);
       setError(
-        reason instanceof Error
-          ? reason.message
-          : "OCR 분석에 실패했습니다.",
+        reason instanceof Error ? reason.message : "OCR 분석에 실패했습니다.",
       );
     }
   }
@@ -378,20 +376,24 @@ export function RecordImportPanel({
             : "CSV · XLSX · HWP · HWPX · PDF 선택"}
         </strong>
         <small>
-          개인 사용기록/잔액 표만 가져오며 규정표나 안내문은 임의로 휴가 사용내역으로
-          만들지 않습니다.
+          개인 사용기록/잔액 표만 가져오며 규정표나 안내문은 임의로 휴가
+          사용내역으로 만들지 않습니다.
         </small>
       </label>
 
       {pendingOcrFile ? (
-        <div className="ocr-consent" role="group" aria-label="스캔 PDF OCR 동의">
+        <div
+          className="ocr-consent"
+          role="group"
+          aria-label="스캔 PDF OCR 동의"
+        >
           <ScanText aria-hidden="true" size={24} />
           <div>
             <strong>스캔 PDF라서 OCR이 필요합니다.</strong>
             <p>
-              한국어·영어 OCR 엔진과 언어 데이터는 네트워크에서 내려받을 수 있지만,
-              선택한 PDF 원본과 렌더링된 페이지 이미지는 브라우저 밖으로 보내지
-              않습니다.
+              한국어·영어 OCR 엔진과 언어 데이터는 네트워크에서 내려받을 수
+              있지만, 선택한 PDF 원본과 렌더링된 페이지 이미지는 브라우저 밖으로
+              보내지 않습니다.
             </p>
             {ocrProgress ? (
               <div className="ocr-consent__progress" role="status">
@@ -410,7 +412,10 @@ export function RecordImportPanel({
               >
                 취소
               </Button>
-              <Button disabled={status === "PARSING"} onClick={() => void runOcr()}>
+              <Button
+                disabled={status === "PARSING"}
+                onClick={() => void runOcr()}
+              >
                 브라우저 OCR로 분석
               </Button>
             </div>
