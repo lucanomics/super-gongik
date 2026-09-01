@@ -20,6 +20,27 @@ export interface PositionedPdfText {
   text: string;
 }
 
+export interface OcrProgress {
+  page: number;
+  totalPages: number;
+  progress: number;
+  status: string;
+}
+
+export interface ParseImportFileOptions {
+  allowPdfOcr?: boolean;
+  onOcrProgress?: (progress: OcrProgress) => void;
+}
+
+export class PdfOcrRequiredError extends Error {
+  constructor() {
+    super(
+      "선택 가능한 텍스트가 없는 스캔 PDF입니다. 브라우저 OCR을 사용하려면 별도로 동의해 주세요.",
+    );
+    this.name = "PdfOcrRequiredError";
+  }
+}
+
 function fileExtension(name: string) {
   const match = name.toLowerCase().match(/\.([a-z0-9]+)$/);
   return match?.[1] ?? "";
@@ -31,6 +52,8 @@ export function formatFromFile(
   const extension = fileExtension(file.name);
   if (extension === "csv" || extension === "tsv") return "CSV";
   if (extension === "xlsx") return "XLSX";
+  if (extension === "hwp") return "HWP";
+  if (extension === "hwpx") return "HWPX";
   if (extension === "pdf" || file.type === "application/pdf") return "PDF_TEXT";
   return "UNKNOWN";
 }
@@ -147,6 +170,103 @@ export async function parseXlsxFile(file: File): Promise<TabularAdapterResult> {
   };
 }
 
+function markdownCells(line: string) {
+  const source = line.trim();
+  if (!source.includes("|")) return null;
+  return source
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((value) => value.replace(/\\\|/g, "|").trim());
+}
+
+function isMarkdownSeparator(cells: string[]) {
+  return (
+    cells.length > 0 &&
+    cells.every((value) => /^:?-{3,}:?$/.test(value.replace(/\s+/g, "")))
+  );
+}
+
+export function tabularFromMarkdownTables(
+  markdown: string,
+  format: "HWP" | "HWPX",
+): TabularAdapterResult {
+  const lines = markdown.split(/\r?\n/);
+  let best:
+    | {
+        headers: string[];
+        rows: TabularRow[];
+        score: number;
+      }
+    | undefined;
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const headerCells = markdownCells(lines[index] ?? "");
+    const separatorCells = markdownCells(lines[index + 1] ?? "");
+    if (!headerCells || !separatorCells || !isMarkdownSeparator(separatorCells)) {
+      continue;
+    }
+
+    const headers = uniqueHeaders(headerCells);
+    const score = mapColumns(headers).length;
+    const rows: TabularRow[] = [];
+
+    for (let rowIndex = index + 2; rowIndex < lines.length; rowIndex += 1) {
+      const cells = markdownCells(lines[rowIndex] ?? "");
+      if (!cells) break;
+      if (isMarkdownSeparator(cells)) continue;
+      const row: TabularRow = {};
+      let populated = false;
+      headers.forEach((header, cellIndex) => {
+        const value = cells[cellIndex] ?? "";
+        row[header] = value;
+        if (value) populated = true;
+      });
+      if (populated) rows.push(row);
+    }
+
+    if (!best || score > best.score) {
+      best = { headers, rows, score };
+    }
+  }
+
+  if (!best || best.score < 2) {
+    throw new Error(
+      "HWP/HWPX에서 개인 복무기록 또는 휴가 잔액 표를 찾지 못했습니다. 규정표나 안내문은 사용기록으로 임의 변환하지 않습니다.",
+    );
+  }
+
+  return {
+    format,
+    headers: best.headers,
+    rows: best.rows,
+    sourceLabel: `${format} 문서 표`,
+  };
+}
+
+export async function parseHwpFile(file: File): Promise<TabularAdapterResult> {
+  const module = await import("@ssabrojs/hwpxjs");
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  const detected = module.detectFormat(bytes);
+
+  if (detected === "hwp") {
+    const markdown = await module.hwpToMarkdown(bytes);
+    return tabularFromMarkdownTables(markdown, "HWP");
+  }
+
+  if (detected === "hwpx") {
+    const reader = new module.default();
+    await reader.loadFromArrayBuffer(buffer);
+    const markdown = await reader.extractMarkdown();
+    return tabularFromMarkdownTables(markdown, "HWPX");
+  }
+
+  throw new Error(
+    "지원되는 HWP 5.x 또는 HWPX 문서가 아닙니다. 암호화·배포용 문서는 현재 가져올 수 없습니다.",
+  );
+}
+
 interface PdfRow {
   page: number;
   y: number;
@@ -210,7 +330,7 @@ export function tabularFromPositionedPdfText(
 
   if (!header || header.score < 2) {
     throw new Error(
-      "PDF에서 표 구조를 찾지 못했습니다. 스캔 문서라면 OCR 분석이 필요합니다.",
+      "PDF에서 복무기록 표 구조를 찾지 못했습니다. 열 인식이 어려운 문서는 원본 형식을 확인해 주세요.",
     );
   }
 
@@ -251,7 +371,7 @@ export function tabularFromPositionedPdfText(
   };
 }
 
-export async function parsePdfFile(file: File): Promise<TabularAdapterResult> {
+async function loadPdf(file: File) {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
   if (!pdfjs.GlobalWorkerOptions.workerPort && typeof Worker !== "undefined") {
@@ -261,10 +381,13 @@ export async function parsePdfFile(file: File): Promise<TabularAdapterResult> {
     );
   }
 
-  const task = pdfjs.getDocument({
+  return pdfjs.getDocument({
     data: new Uint8Array(await file.arrayBuffer()),
-  });
-  const document = await task.promise;
+  }).promise;
+}
+
+export async function parsePdfFile(file: File): Promise<TabularAdapterResult> {
+  const document = await loadPdf(file);
   const items: PositionedPdfText[] = [];
 
   for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
@@ -284,15 +407,118 @@ export async function parsePdfFile(file: File): Promise<TabularAdapterResult> {
   }
 
   if (items.length === 0) {
-    throw new Error(
-      "이 PDF에서는 선택 가능한 텍스트를 찾지 못했습니다. 스캔 PDF OCR 기능이 필요합니다.",
-    );
+    throw new PdfOcrRequiredError();
   }
 
   return tabularFromPositionedPdfText(items);
 }
 
-export async function parseImportFile(file: File): Promise<ParsedImportFile> {
+type OcrBox = { x0: number; y0: number; x1: number; y1: number };
+type OcrWord = { text?: string; bbox?: OcrBox };
+type OcrLine = { words?: OcrWord[]; bbox?: OcrBox };
+type OcrParagraph = { lines?: OcrLine[] };
+type OcrBlock = { paragraphs?: OcrParagraph[] };
+
+function positionedFromOcrBlocks(
+  blocks: unknown,
+  pageNumber: number,
+  canvasHeight: number,
+): PositionedPdfText[] {
+  if (!Array.isArray(blocks)) return [];
+  const positioned: PositionedPdfText[] = [];
+
+  for (const block of blocks as OcrBlock[]) {
+    for (const paragraph of block.paragraphs ?? []) {
+      for (const line of paragraph.lines ?? []) {
+        const lineBox = line.bbox;
+        const lineY = lineBox
+          ? canvasHeight - (lineBox.y0 + lineBox.y1) / 2
+          : null;
+        for (const word of line.words ?? []) {
+          const text = word.text?.trim();
+          const box = word.bbox;
+          if (!text || !box) continue;
+          positioned.push({
+            page: pageNumber,
+            x: box.x0,
+            y: lineY ?? canvasHeight - (box.y0 + box.y1) / 2,
+            text,
+          });
+        }
+      }
+    }
+  }
+
+  return positioned;
+}
+
+export async function parsePdfOcrFile(
+  file: File,
+  onProgress?: (progress: OcrProgress) => void,
+): Promise<TabularAdapterResult> {
+  if (typeof document === "undefined") {
+    throw new Error("OCR은 브라우저에서만 실행할 수 있습니다.");
+  }
+
+  const pdf = await loadPdf(file);
+  const { createWorker } = await import("tesseract.js");
+  let currentPage = 1;
+  const worker = await createWorker(["kor", "eng"], 1, {
+    logger: (message) => {
+      onProgress?.({
+        page: currentPage,
+        totalPages: pdf.numPages,
+        progress: message.progress ?? 0,
+        status: message.status,
+      });
+    },
+  });
+  const positioned: PositionedPdfText[] = [];
+
+  try {
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      currentPage = pageNumber;
+      onProgress?.({
+        page: pageNumber,
+        totalPages: pdf.numPages,
+        progress: 0,
+        status: "rendering page",
+      });
+
+      const page = await pdf.getPage(pageNumber);
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+      const context = canvas.getContext("2d", { alpha: false });
+      if (!context) throw new Error("PDF OCR용 캔버스를 만들지 못했습니다.");
+
+      await page.render({ canvas, viewport }).promise;
+      const result = await worker.recognize(canvas, {}, { blocks: true });
+      positioned.push(
+        ...positionedFromOcrBlocks(result.data.blocks, pageNumber, canvas.height),
+      );
+    }
+  } finally {
+    await worker.terminate();
+  }
+
+  if (positioned.length === 0) {
+    throw new Error("OCR에서 읽을 수 있는 텍스트를 찾지 못했습니다.");
+  }
+
+  const tabular = tabularFromPositionedPdfText(positioned);
+  return {
+    ...tabular,
+    format: "PDF_OCR",
+    sourceLabel: `OCR PDF ${pdf.numPages}페이지`,
+  };
+}
+
+export async function parseImportFile(
+  file: File,
+  options: ParseImportFileOptions = {},
+): Promise<ParsedImportFile> {
   const format = formatFromFile(file);
   let tabular: TabularAdapterResult;
 
@@ -300,10 +526,20 @@ export async function parseImportFile(file: File): Promise<ParsedImportFile> {
     tabular = parseDelimitedText(await file.text());
   } else if (format === "XLSX") {
     tabular = await parseXlsxFile(file);
+  } else if (format === "HWP" || format === "HWPX") {
+    tabular = await parseHwpFile(file);
   } else if (format === "PDF_TEXT") {
-    tabular = await parsePdfFile(file);
+    try {
+      tabular = await parsePdfFile(file);
+    } catch (reason) {
+      if (reason instanceof PdfOcrRequiredError && options.allowPdfOcr) {
+        tabular = await parsePdfOcrFile(file, options.onOcrProgress);
+      } else {
+        throw reason;
+      }
+    }
   } else {
-    throw new Error("CSV, TSV, XLSX 또는 PDF 파일을 선택해 주세요.");
+    throw new Error("CSV, TSV, XLSX, HWP, HWPX 또는 PDF 파일을 선택해 주세요.");
   }
 
   return {
