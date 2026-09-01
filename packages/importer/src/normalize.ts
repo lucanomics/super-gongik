@@ -76,6 +76,16 @@ export function parseClockTime(value: TabularCell): string | null {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+export function parseDayCount(value: TabularCell): number | null {
+  const source = cellToString(value).normalize("NFKC").replace(/\s+/g, "");
+  if (!source) return null;
+
+  const dayMatch = source.match(/^(\d+(?:\.\d+)?)일(?:\d.*)?$/);
+  if (!dayMatch) return null;
+  const days = Number(dayMatch[1]);
+  return Number.isFinite(days) && days >= 0 ? days : null;
+}
+
 export function parseDurationMinutes(value: TabularCell): number | null {
   if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
     return Number.isInteger(value) ? value : Math.round(value * 60);
@@ -92,6 +102,16 @@ export function parseDurationMinutes(value: TabularCell): number | null {
 
   const hourMinute = source.match(/^(\d+)시간(\d+)분$/);
   if (hourMinute) return Number(hourMinute[1]) * 60 + Number(hourMinute[2]);
+
+  const dayHourMinute = source.match(
+    /^\d+(?:\.\d+)?일(?:(\d+(?:\.\d+)?)시간)?(?:(\d+)분)?$/,
+  );
+  if (dayHourMinute && (dayHourMinute[1] || dayHourMinute[2])) {
+    return (
+      Math.round(Number(dayHourMinute[1] ?? 0) * 60) +
+      Number(dayHourMinute[2] ?? 0)
+    );
+  }
 
   const clock = source.match(/^(\d{1,2}):(\d{2})$/);
   if (clock) return Number(clock[1]) * 60 + Number(clock[2]);
@@ -132,20 +152,22 @@ export function normalizeEventRow(
 
   const rawDuration = mappedValue(row, mappings, "duration");
   const durationMinutes = parseDurationMinutes(rawDuration);
+  const durationDays = parseDayCount(rawDuration);
   const startTime = parseClockTime(mappedValue(row, mappings, "startTime"));
   const endTime = parseClockTime(mappedValue(row, mappings, "endTime"));
   const noteText = cellToString(mappedValue(row, mappings, "note"));
 
-  if (rawDuration && durationMinutes === null) {
+  if (rawDuration && durationMinutes === null && durationDays === null) {
     warnings.push({
       code: "UNRECOGNIZED_DURATION",
-      message: `사용시간 '${cellToString(rawDuration)}'을 분 단위로 해석하지 못했습니다.`,
+      message: `사용시간 '${cellToString(rawDuration)}'을 해석하지 못했습니다.`,
     });
   }
 
   if (
     classification.halfDayHint &&
     durationMinutes === null &&
+    durationDays === null &&
     !(startTime && endTime)
   ) {
     warnings.push({
@@ -156,7 +178,7 @@ export function normalizeEventRow(
   }
 
   const confidenceParts = [classification.confidence, date ? 1 : 0.25];
-  if (durationMinutes !== null || (startTime && endTime)) {
+  if (durationMinutes !== null || durationDays !== null || (startTime && endTime)) {
     confidenceParts.push(1);
   }
   const confidence =
@@ -174,7 +196,9 @@ export function normalizeEventRow(
     sourceRowIndex,
     eventType: classification.eventType,
     date,
-    allDay: durationMinutes === null && !startTime && !endTime,
+    allDay:
+      durationDays !== null ||
+      (durationMinutes === null && !startTime && !endTime),
     durationMinutes,
     startTime,
     endTime,
