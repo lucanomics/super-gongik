@@ -1,5 +1,11 @@
 export type ImportSourceFormat =
-  "CSV" | "XLSX" | "PDF_TEXT" | "PDF_OCR" | "UNKNOWN";
+  | "CSV"
+  | "XLSX"
+  | "PDF_TEXT"
+  | "PDF_OCR"
+  | "HWP"
+  | "HWPX"
+  | "UNKNOWN";
 
 export type CanonicalColumn =
   | "date"
