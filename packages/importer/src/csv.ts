@@ -3,9 +3,14 @@ import type { TabularAdapterResult, TabularRow } from "./types";
 function detectDelimiter(text: string): string {
   const firstLine = text.split(/\r?\n/, 1)[0] ?? "";
   const candidates = [",", "\t", ";"];
-  return candidates
-    .map((delimiter) => ({ delimiter, count: firstLine.split(delimiter).length - 1 }))
-    .sort((a, b) => b.count - a.count)[0]?.delimiter ?? ",";
+  return (
+    candidates
+      .map((delimiter) => ({
+        delimiter,
+        count: firstLine.split(delimiter).length - 1,
+      }))
+      .sort((a, b) => b.count - a.count)[0]?.delimiter ?? ","
+  );
 }
 
 function parseRows(text: string, delimiter: string): string[][] {
