@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { tabularFromPositionedPdfText } from "@/lib/file-import-adapters";
+import { tabularFromPositionedPdfText } from "../src/lib/file-import-adapters";
 
 describe("PDF table reconstruction", () => {
   it("reconstructs a positioned text table fixture", () => {
