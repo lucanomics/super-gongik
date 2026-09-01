@@ -277,8 +277,7 @@ export async function parseImportFile(file: File): Promise<ParsedImportFile> {
   let tabular: TabularAdapterResult;
 
   if (format === "CSV") {
-    const delimiter = fileExtension(file.name) === "tsv" ? "\t" : undefined;
-    tabular = parseDelimitedText(await file.text(), delimiter);
+    tabular = parseDelimitedText(await file.text());
   } else if (format === "XLSX") {
     tabular = await parseXlsxFile(file);
   } else if (format === "PDF_TEXT") {
