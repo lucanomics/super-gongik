@@ -69,8 +69,11 @@ export interface LeaveSnapshotCandidate {
   sourceRowIndex: number;
   leaveType: ImportableServiceEventType | null;
   asOfDate: string | null;
+  grantedDays: number | null;
   grantedMinutes: number | null;
+  usedDays: number | null;
   usedMinutes: number | null;
+  remainingDays: number | null;
   remainingMinutes: number | null;
   confidence: number;
   warnings: ImportWarning[];
@@ -115,6 +118,7 @@ export interface TabularAdapterResult {
   format: ImportSourceFormat;
   headers: string[];
   rows: TabularRow[];
+  sourceLabel?: string | null;
 }
 
 export interface ImportFileAdapter<TInput = unknown> {
