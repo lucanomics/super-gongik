@@ -69,11 +69,7 @@ describe("tabular import", () => {
       날짜: "2026-09-01",
       구분: "오후반가",
     };
-    const candidate = normalizeEventRow(
-      row,
-      2,
-      mapColumns(Object.keys(row)),
-    );
+    const candidate = normalizeEventRow(row, 2, mapColumns(Object.keys(row)));
     expect(candidate.eventType).toBe("ANNUAL_LEAVE");
     expect(candidate.durationMinutes).toBeNull();
     expect(candidate.warnings.map((warning) => warning.code)).toContain(
