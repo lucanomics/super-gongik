@@ -115,8 +115,10 @@ export async function buildImportPreview(
       !candidate.date ||
       !candidate.eventType ||
       candidate.confidence < 0.7 ||
-      candidate.warnings.some(
-        (warning) => warning.code === "AMBIGUOUS_HALF_DAY",
+      candidate.warnings.some((warning) =>
+        ["AMBIGUOUS_HALF_DAY", "AMBIGUOUS_DAY_FRACTION"].includes(
+          warning.code,
+        ),
       )
     ) {
       unresolvedRowIndexes.push(sourceRowIndex);
@@ -140,6 +142,12 @@ export function buildImportCommitPlan(input: {
     if (!candidate.date || !candidate.eventType || !candidate.fingerprint) {
       continue;
     }
+    if (
+      candidate.durationDays !== null &&
+      !Number.isInteger(candidate.durationDays)
+    ) {
+      continue;
+    }
 
     if (existing.has(candidate.fingerprint)) {
       skippedDuplicateFingerprints.push(candidate.fingerprint);
@@ -155,6 +163,9 @@ export function buildImportCommitPlan(input: {
         importFingerprint: candidate.fingerprint,
         importConfidence: candidate.confidence,
         importSourceRowIndex: candidate.sourceRowIndex,
+        ...(candidate.durationDays !== null
+          ? { importDayCount: candidate.durationDays }
+          : {}),
       },
     });
   }
