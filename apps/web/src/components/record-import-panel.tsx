@@ -17,8 +17,10 @@ import {
   fingerprintEventCandidate,
   type CanonicalColumn,
   type ColumnMapping,
+  type ImportCommitPlan,
   type ImportPreview,
   type ImportableServiceEventType,
+  type LeaveSnapshotCandidate,
   type ServiceEventCandidate,
   type TabularAdapterResult,
 } from "@super-gongik/importer";
@@ -75,12 +77,10 @@ export function RecordImportPanel({
   imports: StoredImportRecord[];
   workdayMinutes: number | null;
   onSetWorkdayMinutes: (minutes: number | null) => void;
-  onCommit: Parameters<typeof buildImportCommitPlan>[0] extends never
-    ? never
-    : (
-        plan: ReturnType<typeof buildImportCommitPlan>,
-        snapshots: ImportPreview["snapshots"],
-      ) => void;
+  onCommit: (
+    plan: ImportCommitPlan,
+    snapshots: LeaveSnapshotCandidate[],
+  ) => void;
   onRollback: (batchId: string) => void;
 }) {
   const [status, setStatus] = useState<"IDLE" | "PARSING" | "PREVIEW">("IDLE");
@@ -101,6 +101,15 @@ export function RecordImportPanel({
     ).length;
   }, [fingerprints, preview]);
 
+  function resetPreview() {
+    setStatus("IDLE");
+    setPreview(null);
+    setTabular(null);
+    setAcceptedRows(new Set());
+    setAcceptedSnapshots(new Set());
+    setOverrides({});
+  }
+
   async function applyPreview(
     nextTabular: TabularAdapterResult,
     nextPreview: ImportPreview,
@@ -115,8 +124,10 @@ export function RecordImportPanel({
             (event) =>
               event.date &&
               event.eventType &&
-              !event.warnings.some(
-                (warning) => warning.code === "AMBIGUOUS_HALF_DAY",
+              !event.warnings.some((warning) =>
+                ["AMBIGUOUS_HALF_DAY", "AMBIGUOUS_DAY_FRACTION"].includes(
+                  warning.code,
+                ),
               ),
           )
           .map((event) => event.sourceRowIndex),
@@ -155,7 +166,7 @@ export function RecordImportPanel({
         await buildImportPreview(parsed.tabular, batch),
       );
     } catch (reason) {
-      setStatus("IDLE");
+      resetPreview();
       setError(
         reason instanceof Error
           ? reason.message
@@ -212,9 +223,17 @@ export function RecordImportPanel({
   ): Promise<ServiceEventCandidate> {
     const override = overrides[candidate.sourceRowIndex];
     const durationInput = override?.durationMinutes?.trim();
-    const durationMinutes = durationInput
+    const hasDurationOverride = Boolean(durationInput);
+    const durationMinutes = hasDurationOverride
       ? Number(durationInput)
       : candidate.durationMinutes;
+    const validDurationMinutes =
+      durationMinutes !== null &&
+      durationMinutes !== undefined &&
+      Number.isFinite(durationMinutes) &&
+      durationMinutes >= 0
+        ? durationMinutes
+        : null;
     const adjusted: ServiceEventCandidate = {
       ...candidate,
       date: override?.date ?? candidate.date,
@@ -222,18 +241,15 @@ export function RecordImportPanel({
         override?.eventType === ""
           ? null
           : (override?.eventType ?? candidate.eventType),
-      durationMinutes:
-        durationMinutes !== null &&
-        durationMinutes !== undefined &&
-        Number.isFinite(durationMinutes) &&
-        durationMinutes >= 0
-          ? durationMinutes
-          : null,
+      durationDays: hasDurationOverride ? null : candidate.durationDays,
+      durationMinutes: validDurationMinutes,
     };
     adjusted.allDay =
-      adjusted.durationMinutes === null &&
-      !adjusted.startTime &&
-      !adjusted.endTime;
+      (adjusted.durationDays !== null &&
+        Number.isInteger(adjusted.durationDays)) ||
+      (adjusted.durationMinutes === null &&
+        !adjusted.startTime &&
+        !adjusted.endTime);
     adjusted.fingerprint =
       adjusted.date && adjusted.eventType
         ? await fingerprintEventCandidate(adjusted)
@@ -269,9 +285,7 @@ export function RecordImportPanel({
     setMessage(
       `${plan.events.length}개 복무기록과 ${snapshots.length}개 기관 잔액 기록을 저장했어요.`,
     );
-    setStatus("IDLE");
-    setPreview(null);
-    setTabular(null);
+    resetPreview();
   }
 
   return (
@@ -422,7 +436,13 @@ export function RecordImportPanel({
                       aria-label={`행 ${candidate.sourceRowIndex} 사용 분`}
                       inputMode="numeric"
                       min="0"
-                      placeholder={candidate.allDay ? "전일" : "사용 분"}
+                      placeholder={
+                        candidate.durationDays !== null
+                          ? `${candidate.durationDays}일`
+                          : candidate.allDay
+                            ? "전일"
+                            : "사용 분"
+                      }
                       type="number"
                       value={
                         override?.durationMinutes ??
@@ -442,6 +462,9 @@ export function RecordImportPanel({
                           <AlertTriangle aria-hidden="true" size={14} />
                           {candidate.warnings[0]?.message}
                         </span>
+                      ) : null}
+                      {candidate.durationDays !== null ? (
+                        <small>원문 일수: {candidate.durationDays}일</small>
                       ) : null}
                       {candidate.note ? <small>{candidate.note}</small> : null}
                     </div>
@@ -474,7 +497,7 @@ export function RecordImportPanel({
           ) : null}
 
           <div className="import-preview__actions">
-            <Button variant="outline" onClick={() => setStatus("IDLE")}>
+            <Button variant="outline" onClick={resetPreview}>
               취소
             </Button>
             <Button onClick={() => void commit()}>선택 기록 가져오기</Button>
