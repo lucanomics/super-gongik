@@ -8,7 +8,9 @@ function toHex(buffer: ArrayBuffer) {
 
 export async function sha256(value: string | ArrayBuffer): Promise<string> {
   const input =
-    typeof value === "string" ? new TextEncoder().encode(value) : new Uint8Array(value);
+    typeof value === "string"
+      ? new TextEncoder().encode(value)
+      : new Uint8Array(value);
   const digest = await crypto.subtle.digest("SHA-256", input);
   return toHex(digest);
 }
