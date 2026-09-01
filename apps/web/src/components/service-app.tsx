@@ -91,7 +91,10 @@ function remainingAnnualLeaveLabel(
   workdayMinutes: number | null,
 ) {
   const snapshot = summary.institutionSnapshot;
-  if (snapshot?.remainingDays !== null && snapshot?.remainingDays !== undefined) {
+  if (
+    snapshot?.remainingDays !== null &&
+    snapshot?.remainingDays !== undefined
+  ) {
     const minutes = snapshot.remainingMinutes ?? 0;
     return `${snapshot.remainingDays}일${minutes ? ` ${formatPartialMinutes(minutes)}` : ""}`;
   }

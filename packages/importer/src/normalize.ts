@@ -178,7 +178,11 @@ export function normalizeEventRow(
   }
 
   const confidenceParts = [classification.confidence, date ? 1 : 0.25];
-  if (durationMinutes !== null || durationDays !== null || (startTime && endTime)) {
+  if (
+    durationMinutes !== null ||
+    durationDays !== null ||
+    (startTime && endTime)
+  ) {
     confidenceParts.push(1);
   }
   const confidence =

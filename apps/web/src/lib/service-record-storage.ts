@@ -125,7 +125,10 @@ export function saveServiceRecordState(
   serviceProfileId: string,
   state: ServiceRecordState,
 ) {
-  window.localStorage.setItem(storageKey(serviceProfileId), JSON.stringify(state));
+  window.localStorage.setItem(
+    storageKey(serviceProfileId),
+    JSON.stringify(state),
+  );
 }
 
 function toSeoulDateTime(date: string, clock: string | null) {
@@ -136,7 +139,8 @@ function durationBetween(start: string | null, end: string | null) {
   if (!start || !end) return null;
   const [startHours, startMinutes] = start.split(":").map(Number);
   const [endHours, endMinutes] = end.split(":").map(Number);
-  const duration = endHours * 60 + endMinutes - (startHours * 60 + startMinutes);
+  const duration =
+    endHours * 60 + endMinutes - (startHours * 60 + startMinutes);
   return duration > 0 ? duration : null;
 }
 

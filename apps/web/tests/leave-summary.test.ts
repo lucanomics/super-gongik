@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  formatLeaveMinutes,
-  getAnnualLeaveSummary,
-} from "@/lib/leave-summary";
+import { formatLeaveMinutes, getAnnualLeaveSummary } from "@/lib/leave-summary";
 import type {
   StoredLeaveSnapshot,
   StoredServiceEvent,

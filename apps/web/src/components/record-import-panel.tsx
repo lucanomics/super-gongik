@@ -125,7 +125,9 @@ export function RecordImportPanel({
     setAcceptedSnapshots(
       new Set(
         nextPreview.snapshots
-          .filter((snapshot) => snapshot.leaveType && snapshot.confidence >= 0.7)
+          .filter(
+            (snapshot) => snapshot.leaveType && snapshot.confidence >= 0.7,
+          )
           .map((snapshot) => snapshot.sourceRowIndex),
       ),
     );
@@ -257,7 +259,9 @@ export function RecordImportPanel({
     );
 
     if (plan.events.length === 0 && snapshots.length === 0) {
-      setError("가져올 새 기록이 없습니다. 중복 또는 미선택 항목을 확인해 주세요.");
+      setError(
+        "가져올 새 기록이 없습니다. 중복 또는 미선택 항목을 확인해 주세요.",
+      );
       return;
     }
 
@@ -275,14 +279,16 @@ export function RecordImportPanel({
       <div className="record-import__heading">
         <div>
           <h2 id="record-import-title">복무기록 가져오기</h2>
-          <p>기관에서 받은 파일을 기기 안에서 분석해 휴가 기록으로 복원합니다.</p>
+          <p>
+            기관에서 받은 파일을 기기 안에서 분석해 휴가 기록으로 복원합니다.
+          </p>
         </div>
         <Upload aria-hidden="true" size={24} />
       </div>
 
       <div className="record-import__privacy">
-        원본 파일은 기본적으로 서버에 업로드하지 않습니다. CSV, XLSX, 텍스트 PDF는
-        이 브라우저에서 처리합니다.
+        원본 파일은 기본적으로 서버에 업로드하지 않습니다. CSV, XLSX, 텍스트
+        PDF는 이 브라우저에서 처리합니다.
       </div>
 
       <label className="record-import__dropzone">
@@ -296,7 +302,9 @@ export function RecordImportPanel({
           <FileSpreadsheet size={26} />
           <FileText size={26} />
         </span>
-        <strong>{status === "PARSING" ? "파일 분석 중…" : "CSV · XLSX · PDF 선택"}</strong>
+        <strong>
+          {status === "PARSING" ? "파일 분석 중…" : "CSV · XLSX · PDF 선택"}
+        </strong>
         <small>스캔 PDF는 현재 OCR 분석 대상으로 따로 표시됩니다.</small>
       </label>
 
@@ -318,7 +326,8 @@ export function RecordImportPanel({
             <div>
               <strong>{preview.batch.fileName}</strong>
               <p>
-                복무기록 {preview.events.length}건 · 기관 잔액 {preview.snapshots.length}건
+                복무기록 {preview.events.length}건 · 기관 잔액{" "}
+                {preview.snapshots.length}건
                 {duplicateCount ? ` · 기존 중복 ${duplicateCount}건` : ""}
               </p>
             </div>
@@ -361,7 +370,8 @@ export function RecordImportPanel({
               {preview.events.map((candidate) => {
                 const override = overrides[candidate.sourceRowIndex];
                 const duplicate = Boolean(
-                  candidate.fingerprint && fingerprints.has(candidate.fingerprint),
+                  candidate.fingerprint &&
+                  fingerprints.has(candidate.fingerprint),
                 );
                 return (
                   <article
@@ -397,8 +407,7 @@ export function RecordImportPanel({
                       onChange={(event) =>
                         updateOverride(candidate.sourceRowIndex, {
                           eventType: event.target.value as
-                            | ImportableServiceEventType
-                            | "",
+                            ImportableServiceEventType | "",
                         })
                       }
                     >
@@ -504,7 +513,8 @@ export function RecordImportPanel({
               <div>
                 <strong>{record.fileName}</strong>
                 <p>
-                  {new Date(record.createdAt).toLocaleString("ko-KR")} · 기록 {record.eventCount}건
+                  {new Date(record.createdAt).toLocaleString("ko-KR")} · 기록{" "}
+                  {record.eventCount}건
                 </p>
               </div>
               {record.status === "ACTIVE" ? (

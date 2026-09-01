@@ -25,7 +25,9 @@ function fileExtension(name: string) {
   return match?.[1] ?? "";
 }
 
-export function formatFromFile(file: Pick<File, "name" | "type">): ImportSourceFormat {
+export function formatFromFile(
+  file: Pick<File, "name" | "type">,
+): ImportSourceFormat {
   const extension = fileExtension(file.name);
   if (extension === "csv" || extension === "tsv") return "CSV";
   if (extension === "xlsx") return "XLSX";
@@ -34,7 +36,10 @@ export function formatFromFile(file: Pick<File, "name" | "type">): ImportSourceF
 }
 
 async function sha256File(file: Blob) {
-  const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    await file.arrayBuffer(),
+  );
   return Array.from(new Uint8Array(digest))
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("");
@@ -232,10 +237,7 @@ export async function parsePdfFile(file: File): Promise<TabularAdapterResult> {
 
   if (!pdfjs.GlobalWorkerOptions.workerPort && typeof Worker !== "undefined") {
     pdfjs.GlobalWorkerOptions.workerPort = new Worker(
-      new URL(
-        "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
-        import.meta.url,
-      ),
+      new URL("pdfjs-dist/legacy/build/pdf.worker.min.mjs", import.meta.url),
       { type: "module" },
     );
   }
