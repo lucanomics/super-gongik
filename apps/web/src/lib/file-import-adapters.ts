@@ -260,7 +260,7 @@ export async function parseHwpFile(file: File): Promise<TabularAdapterResult> {
   }
 
   if (detected === "hwpx") {
-    const reader = new hwpxModule.default();
+    const reader = new hwpxModule.HwpxReader();
     await reader.loadFromArrayBuffer(buffer);
     const markdown = await reader.extractMarkdown();
     return tabularFromMarkdownTables(markdown, "HWPX");
