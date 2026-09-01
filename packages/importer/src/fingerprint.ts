@@ -22,6 +22,7 @@ export async function fingerprintEventCandidate(
     date: candidate.date,
     eventType: candidate.eventType,
     allDay: candidate.allDay,
+    durationDays: candidate.durationDays,
     durationMinutes: candidate.durationMinutes,
     startTime: candidate.startTime,
     endTime: candidate.endTime,

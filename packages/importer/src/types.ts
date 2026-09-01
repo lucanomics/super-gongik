@@ -1,5 +1,5 @@
 export type ImportSourceFormat =
-  "CSV" | "XLSX" | "PDF_TEXT" | "PDF_OCR" | "UNKNOWN";
+  "CSV" | "XLSX" | "PDF_TEXT" | "PDF_OCR" | "HWP" | "HWPX" | "UNKNOWN";
 
 export type CanonicalColumn =
   | "date"
@@ -43,6 +43,7 @@ export type ImportWarningCode =
   | "UNRECOGNIZED_EVENT_TYPE"
   | "UNRECOGNIZED_DURATION"
   | "AMBIGUOUS_HALF_DAY"
+  | "AMBIGUOUS_DAY_FRACTION"
   | "LOW_CONFIDENCE";
 
 export interface ImportWarning {
@@ -55,6 +56,7 @@ export interface ServiceEventCandidate {
   eventType: ImportableServiceEventType | null;
   date: string | null;
   allDay: boolean;
+  durationDays: number | null;
   durationMinutes: number | null;
   startTime: string | null;
   endTime: string | null;
@@ -69,8 +71,11 @@ export interface LeaveSnapshotCandidate {
   sourceRowIndex: number;
   leaveType: ImportableServiceEventType | null;
   asOfDate: string | null;
+  grantedDays: number | null;
   grantedMinutes: number | null;
+  usedDays: number | null;
   usedMinutes: number | null;
+  remainingDays: number | null;
   remainingMinutes: number | null;
   confidence: number;
   warnings: ImportWarning[];
@@ -100,6 +105,7 @@ export interface ImportedEventMetadata {
   importFingerprint: string;
   importConfidence: number;
   importSourceRowIndex: number;
+  importDayCount?: number;
 }
 
 export interface ImportCommitPlan {
@@ -115,6 +121,7 @@ export interface TabularAdapterResult {
   format: ImportSourceFormat;
   headers: string[];
   rows: TabularRow[];
+  sourceLabel?: string | null;
 }
 
 export interface ImportFileAdapter<TInput = unknown> {

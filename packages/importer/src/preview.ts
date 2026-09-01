@@ -4,9 +4,11 @@ import { findMappedHeader, mapColumns } from "./mapping";
 import {
   normalizeEventRow,
   parseDateCell,
+  parseDayCount,
   parseDurationMinutes,
 } from "./normalize";
 import type {
+  ColumnMapping,
   ImportBatchDescriptor,
   ImportCommitPlan,
   ImportPreview,
@@ -56,17 +58,22 @@ function normalizeSnapshotRow(
   const classification = classifyEventType(
     getValue(row, mappings, "eventType"),
   );
+  const granted = getValue(row, mappings, "granted");
+  const used = getValue(row, mappings, "used");
+  const remaining = getValue(row, mappings, "remaining");
+
   return {
     sourceRowIndex,
     leaveType: classification.eventType,
     asOfDate:
       parseDateCell(getValue(row, mappings, "asOfDate")) ??
       parseDateCell(getValue(row, mappings, "date")),
-    grantedMinutes: parseDurationMinutes(getValue(row, mappings, "granted")),
-    usedMinutes: parseDurationMinutes(getValue(row, mappings, "used")),
-    remainingMinutes: parseDurationMinutes(
-      getValue(row, mappings, "remaining"),
-    ),
+    grantedDays: parseDayCount(granted),
+    grantedMinutes: parseDurationMinutes(granted),
+    usedDays: parseDayCount(used),
+    usedMinutes: parseDurationMinutes(used),
+    remainingDays: parseDayCount(remaining),
+    remainingMinutes: parseDurationMinutes(remaining),
     confidence: classification.confidence,
     warnings: classification.warnings,
     raw: row,
@@ -76,8 +83,9 @@ function normalizeSnapshotRow(
 export async function buildImportPreview(
   tabular: TabularAdapterResult,
   batch: ImportBatchDescriptor,
+  mappingOverride?: ColumnMapping[],
 ): Promise<ImportPreview> {
-  const mappings = mapColumns(tabular.headers);
+  const mappings = mappingOverride ?? mapColumns(tabular.headers);
   const hasDateColumn = mappings.some((mapping) => mapping.target === "date");
   const snapshotShape = isSnapshotShape(mappings);
   const events: ServiceEventCandidate[] = [];
@@ -107,8 +115,8 @@ export async function buildImportPreview(
       !candidate.date ||
       !candidate.eventType ||
       candidate.confidence < 0.7 ||
-      candidate.warnings.some(
-        (warning) => warning.code === "AMBIGUOUS_HALF_DAY",
+      candidate.warnings.some((warning) =>
+        ["AMBIGUOUS_HALF_DAY", "AMBIGUOUS_DAY_FRACTION"].includes(warning.code),
       )
     ) {
       unresolvedRowIndexes.push(sourceRowIndex);
@@ -132,6 +140,12 @@ export function buildImportCommitPlan(input: {
     if (!candidate.date || !candidate.eventType || !candidate.fingerprint) {
       continue;
     }
+    if (
+      candidate.durationDays !== null &&
+      !Number.isInteger(candidate.durationDays)
+    ) {
+      continue;
+    }
 
     if (existing.has(candidate.fingerprint)) {
       skippedDuplicateFingerprints.push(candidate.fingerprint);
@@ -147,6 +161,9 @@ export function buildImportCommitPlan(input: {
         importFingerprint: candidate.fingerprint,
         importConfidence: candidate.confidence,
         importSourceRowIndex: candidate.sourceRowIndex,
+        ...(candidate.durationDays !== null
+          ? { importDayCount: candidate.durationDays }
+          : {}),
       },
     });
   }
