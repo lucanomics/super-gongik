@@ -164,6 +164,13 @@ export function normalizeEventRow(
     });
   }
 
+  if (durationDays !== null && !Number.isInteger(durationDays)) {
+    warnings.push({
+      code: "AMBIGUOUS_DAY_FRACTION",
+      message: `${durationDays}일은 1일 근무시간 확인 없이 분 단위로 자동 변환하지 않습니다. 사용 분을 직접 확인해 주세요.`,
+    });
+  }
+
   if (
     classification.halfDayHint &&
     durationMinutes === null &&
@@ -201,8 +208,9 @@ export function normalizeEventRow(
     eventType: classification.eventType,
     date,
     allDay:
-      durationDays !== null ||
+      (durationDays !== null && Number.isInteger(durationDays)) ||
       (durationMinutes === null && !startTime && !endTime),
+    durationDays,
     durationMinutes,
     startTime,
     endTime,
