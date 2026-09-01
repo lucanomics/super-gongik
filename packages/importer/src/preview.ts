@@ -1,13 +1,18 @@
 import { classifyEventType } from "./classify";
 import { fingerprintEventCandidate } from "./fingerprint";
-import { mapColumns, findMappedHeader } from "./mapping";
-import { normalizeEventRow, parseDateCell, parseDurationMinutes } from "./normalize";
+import { findMappedHeader, mapColumns } from "./mapping";
+import {
+  normalizeEventRow,
+  parseDateCell,
+  parseDurationMinutes,
+} from "./normalize";
 import type {
   ImportBatchDescriptor,
   ImportCommitPlan,
   ImportPreview,
   ImportSourceFormat,
   LeaveSnapshotCandidate,
+  ServiceEventCandidate,
   TabularAdapterResult,
   TabularRow,
 } from "./types";
@@ -48,16 +53,22 @@ function normalizeSnapshotRow(
   sourceRowIndex: number,
   mappings: ReturnType<typeof mapColumns>,
 ): LeaveSnapshotCandidate {
-  const classification = classifyEventType(getValue(row, mappings, "eventType"));
+  const classification = classifyEventType(
+    getValue(row, mappings, "eventType"),
+  );
   return {
     sourceRowIndex,
     leaveType: classification.eventType,
     asOfDate:
       parseDateCell(getValue(row, mappings, "asOfDate")) ??
       parseDateCell(getValue(row, mappings, "date")),
-    grantedMinutes: parseDurationMinutes(getValue(row, mappings, "granted")),
+    grantedMinutes: parseDurationMinutes(
+      getValue(row, mappings, "granted"),
+    ),
     usedMinutes: parseDurationMinutes(getValue(row, mappings, "used")),
-    remainingMinutes: parseDurationMinutes(getValue(row, mappings, "remaining")),
+    remainingMinutes: parseDurationMinutes(
+      getValue(row, mappings, "remaining"),
+    ),
     confidence: classification.confidence,
     warnings: classification.warnings,
     raw: row,
@@ -71,7 +82,7 @@ export async function buildImportPreview(
   const mappings = mapColumns(tabular.headers);
   const hasDateColumn = mappings.some((mapping) => mapping.target === "date");
   const snapshotShape = isSnapshotShape(mappings);
-  const events = [];
+  const events: ServiceEventCandidate[] = [];
   const snapshots: LeaveSnapshotCandidate[] = [];
   const unresolvedRowIndexes: number[] = [];
 
@@ -98,7 +109,9 @@ export async function buildImportPreview(
       !candidate.date ||
       !candidate.eventType ||
       candidate.confidence < 0.7 ||
-      candidate.warnings.some((warning) => warning.code === "AMBIGUOUS_HALF_DAY")
+      candidate.warnings.some(
+        (warning) => warning.code === "AMBIGUOUS_HALF_DAY",
+      )
     ) {
       unresolvedRowIndexes.push(sourceRowIndex);
     }
@@ -118,7 +131,9 @@ export function buildImportCommitPlan(input: {
 
   for (const candidate of input.preview.events) {
     if (!input.acceptedRowIndexes.has(candidate.sourceRowIndex)) continue;
-    if (!candidate.date || !candidate.eventType || !candidate.fingerprint) continue;
+    if (!candidate.date || !candidate.eventType || !candidate.fingerprint) {
+      continue;
+    }
 
     if (existing.has(candidate.fingerprint)) {
       skippedDuplicateFingerprints.push(candidate.fingerprint);
@@ -155,7 +170,8 @@ export function getImportedEventIdsForRollback(
 ): string[] {
   return events
     .filter(
-      (event) => !event.deletedAt && event.metadata?.importBatchId === batchId,
+      (event) =>
+        !event.deletedAt && event.metadata?.importBatchId === batchId,
     )
     .map((event) => event.id);
 }
