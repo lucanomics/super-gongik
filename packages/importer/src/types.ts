@@ -43,6 +43,7 @@ export type ImportWarningCode =
   | "UNRECOGNIZED_EVENT_TYPE"
   | "UNRECOGNIZED_DURATION"
   | "AMBIGUOUS_HALF_DAY"
+  | "AMBIGUOUS_DAY_FRACTION"
   | "LOW_CONFIDENCE";
 
 export interface ImportWarning {
@@ -55,6 +56,7 @@ export interface ServiceEventCandidate {
   eventType: ImportableServiceEventType | null;
   date: string | null;
   allDay: boolean;
+  durationDays: number | null;
   durationMinutes: number | null;
   startTime: string | null;
   endTime: string | null;
@@ -103,6 +105,7 @@ export interface ImportedEventMetadata {
   importFingerprint: string;
   importConfidence: number;
   importSourceRowIndex: number;
+  importDayCount?: number;
 }
 
 export interface ImportCommitPlan {
