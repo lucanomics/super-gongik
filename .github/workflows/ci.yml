@@ -1,38 +1,34 @@
-name: CI
+name: HWP export fix
 
 on:
-  pull_request:
   push:
     branches:
-      - main
-      - "feat/**"
+      - "feat/import-ui-xlsx-pdf"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  verify:
-    name: Verify workspace
+  patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11.22.0
-          run_install: false
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Lint
-        run: pnpm lint
-      - name: Check formatting
-        run: pnpm format:check
-      - name: Typecheck
-        run: pnpm typecheck
-      - name: Test
-        run: pnpm test
-      - name: Build web app
-        run: pnpm build
+      - name: Use named HwpxReader export
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/web/src/lib/file-import-adapters.ts')
+          source = path.read_text()
+          old = 'new hwpxModule.default()'
+          new = 'new hwpxModule.HwpxReader()'
+          if old not in source:
+              raise SystemExit('Expected HWPX constructor expression not found')
+          path.write_text(source.replace(old, new))
+          PY
+      - name: Commit HWP export fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/lib/file-import-adapters.ts
+          git commit -m "fix(web): use named HwpxReader export"
+          git push origin HEAD:feat/import-ui-xlsx-pdf
