@@ -62,9 +62,7 @@ function normalizeSnapshotRow(
     asOfDate:
       parseDateCell(getValue(row, mappings, "asOfDate")) ??
       parseDateCell(getValue(row, mappings, "date")),
-    grantedMinutes: parseDurationMinutes(
-      getValue(row, mappings, "granted"),
-    ),
+    grantedMinutes: parseDurationMinutes(getValue(row, mappings, "granted")),
     usedMinutes: parseDurationMinutes(getValue(row, mappings, "used")),
     remainingMinutes: parseDurationMinutes(
       getValue(row, mappings, "remaining"),
@@ -170,8 +168,7 @@ export function getImportedEventIdsForRollback(
 ): string[] {
   return events
     .filter(
-      (event) =>
-        !event.deletedAt && event.metadata?.importBatchId === batchId,
+      (event) => !event.deletedAt && event.metadata?.importBatchId === batchId,
     )
     .map((event) => event.id);
 }
