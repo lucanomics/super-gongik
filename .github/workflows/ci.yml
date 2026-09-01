@@ -1,15 +1,18 @@
-name: Lockfile bootstrap
+name: CI
 
 on:
+  pull_request:
   push:
     branches:
-      - "feat/import-ui-xlsx-pdf"
+      - main
+      - "feat/**"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  lockfile:
+  verify:
+    name: Verify workspace
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -21,16 +24,15 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - name: Refresh lockfile
-        run: pnpm install --no-frozen-lockfile
-      - name: Commit generated lockfile
-        run: |
-          if git diff --quiet -- pnpm-lock.yaml; then
-            echo "Lockfile already current"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pnpm-lock.yaml
-          git commit -m "chore: refresh lockfile for file import"
-          git push origin HEAD:feat/import-ui-xlsx-pdf
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build web app
+        run: pnpm build
