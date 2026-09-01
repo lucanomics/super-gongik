@@ -1,7 +1,7 @@
 import type {
   StoredLeaveSnapshot,
   StoredServiceEvent,
-} from "@/lib/service-record-storage";
+} from "./service-record-storage";
 
 export interface AnnualLeaveSummary {
   fullDayEvents: number;
