@@ -27,7 +27,11 @@ export function parseDateCell(value: TabularCell): string | null {
 
   const compact = source.match(/^(\d{4})(\d{2})(\d{2})$/);
   if (compact) {
-    return validateDateParts(Number(compact[1]), Number(compact[2]), Number(compact[3]));
+    return validateDateParts(
+      Number(compact[1]),
+      Number(compact[2]),
+      Number(compact[3]),
+    );
   }
 
   const delimited = source.match(
@@ -44,7 +48,11 @@ export function parseDateCell(value: TabularCell): string | null {
   return null;
 }
 
-function validateDateParts(year: number, month: number, day: number): string | null {
+function validateDateParts(
+  year: number,
+  month: number,
+  day: number,
+): string | null {
   const probe = new Date(Date.UTC(year, month - 1, day));
   if (
     probe.getUTCFullYear() !== year ||
@@ -117,7 +125,9 @@ export function normalizeEventRow(
     });
   }
 
-  const classification = classifyEventType(mappedValue(row, mappings, "eventType"));
+  const classification = classifyEventType(
+    mappedValue(row, mappings, "eventType"),
+  );
   warnings.push(...classification.warnings);
 
   const rawDuration = mappedValue(row, mappings, "duration");
@@ -146,9 +156,12 @@ export function normalizeEventRow(
   }
 
   const confidenceParts = [classification.confidence, date ? 1 : 0.25];
-  if (durationMinutes !== null || (startTime && endTime)) confidenceParts.push(1);
+  if (durationMinutes !== null || (startTime && endTime)) {
+    confidenceParts.push(1);
+  }
   const confidence =
-    confidenceParts.reduce((sum, value) => sum + value, 0) / confidenceParts.length;
+    confidenceParts.reduce((sum, value) => sum + value, 0) /
+    confidenceParts.length;
 
   if (confidence < 0.7) {
     warnings.push({
