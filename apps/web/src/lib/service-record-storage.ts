@@ -25,6 +25,7 @@ export interface StoredServiceEvent {
     importFingerprint?: string;
     importConfidence?: number;
     importSourceRowIndex?: number;
+    importDayCount?: number;
   };
   createdAt: string;
   updatedAt: string;
