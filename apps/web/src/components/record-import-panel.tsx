@@ -6,6 +6,7 @@ import {
   FileSpreadsheet,
   FileText,
   RotateCcw,
+  ScanText,
   Upload,
 } from "lucide-react";
 import { type ChangeEvent, useMemo, useState } from "react";
@@ -26,7 +27,12 @@ import {
 } from "@super-gongik/importer";
 
 import { Button } from "@/components/ui/button";
-import { parseImportFile } from "@/lib/file-import-adapters";
+import {
+  parseImportFile,
+  PdfOcrRequiredError,
+  type OcrProgress,
+  type ParseImportFileOptions,
+} from "@/lib/file-import-adapters";
 import type { StoredImportRecord } from "@/lib/service-record-storage";
 
 const EVENT_OPTIONS: Array<{
@@ -93,6 +99,8 @@ export function RecordImportPanel({
     new Set(),
   );
   const [overrides, setOverrides] = useState<Record<number, EventOverride>>({});
+  const [pendingOcrFile, setPendingOcrFile] = useState<File | null>(null);
+  const [ocrProgress, setOcrProgress] = useState<OcrProgress | null>(null);
 
   const duplicateCount = useMemo(() => {
     if (!preview) return 0;
@@ -108,6 +116,8 @@ export function RecordImportPanel({
     setAcceptedRows(new Set());
     setAcceptedSnapshots(new Set());
     setOverrides({});
+    setPendingOcrFile(null);
+    setOcrProgress(null);
   }
 
   async function applyPreview(
@@ -117,6 +127,8 @@ export function RecordImportPanel({
     setTabular(nextTabular);
     setPreview(nextPreview);
     setOverrides({});
+    setPendingOcrFile(null);
+    setOcrProgress(null);
     setAcceptedRows(
       new Set(
         nextPreview.events
@@ -145,32 +157,71 @@ export function RecordImportPanel({
     setStatus("PREVIEW");
   }
 
+  async function parseAndPreview(
+    file: File,
+    options: ParseImportFileOptions = {},
+  ) {
+    const parsed = await parseImportFile(file, options);
+    const batch = createImportBatchDescriptor({
+      fileName: file.name,
+      sourceFormat: parsed.tabular.format,
+      fileSha256: parsed.fileSha256,
+    });
+    await applyPreview(
+      parsed.tabular,
+      await buildImportPreview(parsed.tabular, batch),
+    );
+  }
+
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
 
+    resetPreview();
     setStatus("PARSING");
     setError("");
     setMessage("");
 
     try {
-      const parsed = await parseImportFile(file);
-      const batch = createImportBatchDescriptor({
-        fileName: file.name,
-        sourceFormat: parsed.tabular.format,
-        fileSha256: parsed.fileSha256,
-      });
-      await applyPreview(
-        parsed.tabular,
-        await buildImportPreview(parsed.tabular, batch),
-      );
+      await parseAndPreview(file);
     } catch (reason) {
-      resetPreview();
+      setStatus("IDLE");
+      setPreview(null);
+      setTabular(null);
+      if (reason instanceof PdfOcrRequiredError) {
+        setPendingOcrFile(file);
+        setError("");
+        return;
+      }
       setError(
         reason instanceof Error
           ? reason.message
           : "파일을 분석하지 못했습니다.",
+      );
+    }
+  }
+
+  async function runOcr() {
+    if (!pendingOcrFile) return;
+    const file = pendingOcrFile;
+    setStatus("PARSING");
+    setError("");
+    setMessage("");
+    setOcrProgress({ page: 1, totalPages: 1, progress: 0, status: "starting" });
+
+    try {
+      await parseAndPreview(file, {
+        allowPdfOcr: true,
+        onOcrProgress: setOcrProgress,
+      });
+    } catch (reason) {
+      setStatus("IDLE");
+      setOcrProgress(null);
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : "OCR 분석에 실패했습니다.",
       );
     }
   }
@@ -288,6 +339,10 @@ export function RecordImportPanel({
     resetPreview();
   }
 
+  const parsingLabel = ocrProgress
+    ? `OCR ${ocrProgress.page}/${ocrProgress.totalPages} · ${Math.round(ocrProgress.progress * 100)}%`
+    : "파일 분석 중…";
+
   return (
     <section className="record-import" aria-labelledby="record-import-title">
       <div className="record-import__heading">
@@ -301,13 +356,14 @@ export function RecordImportPanel({
       </div>
 
       <div className="record-import__privacy">
-        원본 파일은 기본적으로 서버에 업로드하지 않습니다. CSV, XLSX, 텍스트
-        PDF는 이 브라우저에서 처리합니다.
+        CSV, XLSX, HWP, HWPX, 텍스트 PDF는 브라우저 안에서 처리합니다. 스캔
+        PDF도 동의 후 브라우저 OCR을 사용하며 원본 파일이나 페이지 이미지는
+        서버에 업로드하지 않습니다.
       </div>
 
       <label className="record-import__dropzone">
         <input
-          accept=".csv,.tsv,.xlsx,.pdf,text/csv,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          accept=".csv,.tsv,.xlsx,.hwp,.hwpx,.pdf,text/csv,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-hwp,application/haansofthwp"
           disabled={status === "PARSING"}
           onChange={handleFile}
           type="file"
@@ -317,10 +373,50 @@ export function RecordImportPanel({
           <FileText size={26} />
         </span>
         <strong>
-          {status === "PARSING" ? "파일 분석 중…" : "CSV · XLSX · PDF 선택"}
+          {status === "PARSING"
+            ? parsingLabel
+            : "CSV · XLSX · HWP · HWPX · PDF 선택"}
         </strong>
-        <small>스캔 PDF는 현재 OCR 분석 대상으로 따로 표시됩니다.</small>
+        <small>
+          개인 사용기록/잔액 표만 가져오며 규정표나 안내문은 임의로 휴가 사용내역으로
+          만들지 않습니다.
+        </small>
       </label>
+
+      {pendingOcrFile ? (
+        <div className="ocr-consent" role="group" aria-label="스캔 PDF OCR 동의">
+          <ScanText aria-hidden="true" size={24} />
+          <div>
+            <strong>스캔 PDF라서 OCR이 필요합니다.</strong>
+            <p>
+              한국어·영어 OCR 엔진과 언어 데이터는 네트워크에서 내려받을 수 있지만,
+              선택한 PDF 원본과 렌더링된 페이지 이미지는 브라우저 밖으로 보내지
+              않습니다.
+            </p>
+            {ocrProgress ? (
+              <div className="ocr-consent__progress" role="status">
+                <progress max={1} value={ocrProgress.progress} />
+                <span>
+                  {ocrProgress.page}/{ocrProgress.totalPages}페이지 ·{" "}
+                  {Math.round(ocrProgress.progress * 100)}%
+                </span>
+              </div>
+            ) : null}
+            <div className="ocr-consent__actions">
+              <Button
+                variant="outline"
+                disabled={status === "PARSING"}
+                onClick={resetPreview}
+              >
+                취소
+              </Button>
+              <Button disabled={status === "PARSING"} onClick={() => void runOcr()}>
+                브라우저 OCR로 분석
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {error ? (
         <p className="form-error" role="alert">
