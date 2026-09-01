@@ -203,11 +203,7 @@ export function tabularFromMarkdownTables(
   for (let index = 0; index < lines.length - 1; index += 1) {
     const headerCells = markdownCells(lines[index] ?? "");
     const separatorCells = markdownCells(lines[index + 1] ?? "");
-    if (
-      !headerCells ||
-      !separatorCells ||
-      !isMarkdownSeparator(separatorCells)
-    ) {
+    if (!headerCells || !separatorCells || !isMarkdownSeparator(separatorCells)) {
       continue;
     }
 
@@ -249,18 +245,18 @@ export function tabularFromMarkdownTables(
 }
 
 export async function parseHwpFile(file: File): Promise<TabularAdapterResult> {
-  const module = await import("@ssabrojs/hwpxjs");
+  const hwpxModule = await import("@ssabrojs/hwpxjs");
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
-  const detected = module.detectFormat(bytes);
+  const detected = hwpxModule.detectFormat(bytes);
 
   if (detected === "hwp") {
-    const markdown = await module.hwpToMarkdown(bytes);
+    const markdown = await hwpxModule.hwpToMarkdown(bytes);
     return tabularFromMarkdownTables(markdown, "HWP");
   }
 
   if (detected === "hwpx") {
-    const reader = new module.default();
+    const reader = new hwpxModule.default();
     await reader.loadFromArrayBuffer(buffer);
     const markdown = await reader.extractMarkdown();
     return tabularFromMarkdownTables(markdown, "HWPX");
@@ -311,7 +307,10 @@ function normalizePdfHeaderText(value: string) {
   return value.normalize("NFKC").trim().toLowerCase().replace(/\s+/g, "");
 }
 
-function isRepeatedPdfHeader(row: PdfRow, headerCells: PositionedPdfText[]) {
+function isRepeatedPdfHeader(
+  row: PdfRow,
+  headerCells: PositionedPdfText[],
+) {
   const headerLabels = new Set(
     headerCells.map((cell) => normalizePdfHeaderText(cell.text)),
   );
@@ -497,11 +496,7 @@ export async function parsePdfOcrFile(
       await page.render({ canvas, viewport }).promise;
       const result = await worker.recognize(canvas, {}, { blocks: true });
       positioned.push(
-        ...positionedFromOcrBlocks(
-          result.data.blocks,
-          pageNumber,
-          canvas.height,
-        ),
+        ...positionedFromOcrBlocks(result.data.blocks, pageNumber, canvas.height),
       );
     }
   } finally {
