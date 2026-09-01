@@ -1,15 +1,18 @@
-name: Parser format bootstrap
+name: CI
 
 on:
+  pull_request:
   push:
     branches:
-      - "feat/import-ui-xlsx-pdf"
+      - main
+      - "feat/**"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  format:
+  verify:
+    name: Verify workspace
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -21,16 +24,15 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec prettier --write apps/web/src/lib/file-import-adapters.ts
-      - name: Commit formatted parser
-        run: |
-          if git diff --quiet; then
-            echo "Parser formatting already current"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/src/lib/file-import-adapters.ts
-          git commit -m "style(web): format HWP OCR adapters"
-          git push origin HEAD:feat/import-ui-xlsx-pdf
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Check formatting
+        run: pnpm format:check
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Test
+        run: pnpm test
+      - name: Build web app
+        run: pnpm build
