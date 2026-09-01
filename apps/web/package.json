@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@ssabrojs/hwpxjs": "0.4.0",
     "@super-gongik/domain": "workspace:*",
     "@super-gongik/importer": "workspace:*",
     "@super-gongik/rules": "workspace:*",
@@ -23,6 +24,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "tailwind-merge": "^3.6.0",
+    "tesseract.js": "7.0.0",
     "zod": "^4.5.2"
   },
   "devDependencies": {
