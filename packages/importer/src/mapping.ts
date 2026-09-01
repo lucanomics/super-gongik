@@ -38,9 +38,32 @@ const HEADER_SYNONYMS: Record<CanonicalColumn, string[]> = {
     "hours",
     "minutes",
   ],
-  startTime: ["시작", "시작시간", "시각부터", "from", "start", "starttime"],
-  endTime: ["종료", "종료시간", "시각까지", "to", "end", "endtime"],
-  note: ["비고", "사유", "메모", "내용", "remark", "remarks", "note", "memo"],
+  startTime: [
+    "시작",
+    "시작시간",
+    "시각부터",
+    "from",
+    "start",
+    "starttime",
+  ],
+  endTime: [
+    "종료",
+    "종료시간",
+    "시각까지",
+    "to",
+    "end",
+    "endtime",
+  ],
+  note: [
+    "비고",
+    "사유",
+    "메모",
+    "내용",
+    "remark",
+    "remarks",
+    "note",
+    "memo",
+  ],
   granted: [
     "부여",
     "부여량",
@@ -100,7 +123,9 @@ export function mapColumns(headers: string[]): ColumnMapping[] {
     for (const [target, synonyms] of Object.entries(HEADER_SYNONYMS) as Array<
       [CanonicalColumn, string[]]
     >) {
-      const confidence = Math.max(...synonyms.map((item) => scoreHeader(header, item)));
+      const confidence = Math.max(
+        ...synonyms.map((item) => scoreHeader(header, item)),
+      );
       if (confidence >= 0.8) {
         candidates.push({ sourceHeader: header, target, confidence });
       }
@@ -123,12 +148,16 @@ export function mapColumns(headers: string[]): ColumnMapping[] {
       selectedHeaders.add(candidate.sourceHeader);
       return true;
     })
-    .sort((a, b) => headers.indexOf(a.sourceHeader) - headers.indexOf(b.sourceHeader));
+    .sort(
+      (a, b) => headers.indexOf(a.sourceHeader) - headers.indexOf(b.sourceHeader),
+    );
 }
 
 export function findMappedHeader(
   mappings: ColumnMapping[],
   target: CanonicalColumn,
 ): string | null {
-  return mappings.find((mapping) => mapping.target === target)?.sourceHeader ?? null;
+  return (
+    mappings.find((mapping) => mapping.target === target)?.sourceHeader ?? null
+  );
 }
