@@ -1,9 +1,5 @@
 export type ImportSourceFormat =
-  | "CSV"
-  | "XLSX"
-  | "PDF_TEXT"
-  | "PDF_OCR"
-  | "UNKNOWN";
+  "CSV" | "XLSX" | "PDF_TEXT" | "PDF_OCR" | "UNKNOWN";
 
 export type CanonicalColumn =
   | "date"
@@ -17,13 +13,7 @@ export type CanonicalColumn =
   | "remaining"
   | "asOfDate";
 
-export type TabularCell =
-  | string
-  | number
-  | boolean
-  | Date
-  | null
-  | undefined;
+export type TabularCell = string | number | boolean | Date | null | undefined;
 export type TabularRow = Record<string, TabularCell>;
 
 export type ImportableServiceEventType =
