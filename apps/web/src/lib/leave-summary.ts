@@ -20,9 +20,12 @@ export function getAnnualLeaveSummary(input: {
   const annualEvents = input.events.filter(
     (event) => event.eventType === "ANNUAL_LEAVE" && !event.deletedAt,
   );
-  const fullDayEvents = annualEvents.filter(
-    (event) => event.allDay && event.durationMinutes === null,
-  ).length;
+  const fullDayEvents = annualEvents
+    .filter((event) => event.allDay && event.durationMinutes === null)
+    .reduce(
+      (sum, event) => sum + (event.metadata.importDayCount ?? 1),
+      0,
+    );
   const partialMinutes = annualEvents.reduce(
     (sum, event) => sum + (event.durationMinutes ?? 0),
     0,
