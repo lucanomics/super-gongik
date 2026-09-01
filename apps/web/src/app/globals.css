@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./service-app.css";
+@import "./import.css";
 
 :root {
   --navy: #071a3d;
