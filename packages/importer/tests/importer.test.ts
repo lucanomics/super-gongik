@@ -19,15 +19,26 @@ describe("tabular import", () => {
     const parsed = parseDelimitedText(
       '사용일자,복무상황,사용시간,비고\n2026-06-12,오후반가,4시간,"병원, 진료"',
     );
-    expect(parsed.headers).toEqual(["사용일자", "복무상황", "사용시간", "비고"]);
+    expect(parsed.headers).toEqual([
+      "사용일자",
+      "복무상황",
+      "사용시간",
+      "비고",
+    ]);
     expect(parsed.rows[0]?.비고).toBe("병원, 진료");
 
     const mappings = mapColumns(parsed.headers);
     expect(mappings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ sourceHeader: "사용일자", target: "date" }),
-        expect.objectContaining({ sourceHeader: "복무상황", target: "eventType" }),
-        expect.objectContaining({ sourceHeader: "사용시간", target: "duration" }),
+        expect.objectContaining({
+          sourceHeader: "복무상황",
+          target: "eventType",
+        }),
+        expect.objectContaining({
+          sourceHeader: "사용시간",
+          target: "duration",
+        }),
       ]),
     );
   });
@@ -58,7 +69,11 @@ describe("tabular import", () => {
       날짜: "2026-09-01",
       구분: "오후반가",
     };
-    const candidate = normalizeEventRow(row, 2, mapColumns(Object.keys(row)));
+    const candidate = normalizeEventRow(
+      row,
+      2,
+      mapColumns(Object.keys(row)),
+    );
     expect(candidate.eventType).toBe("ANNUAL_LEAVE");
     expect(candidate.durationMinutes).toBeNull();
     expect(candidate.warnings.map((warning) => warning.code)).toContain(
