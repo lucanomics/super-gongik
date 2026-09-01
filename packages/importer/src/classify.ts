@@ -6,14 +6,7 @@ const EVENT_TYPE_SYNONYMS: Array<{
 }> = [
   {
     type: "ANNUAL_LEAVE",
-    labels: [
-      "연가",
-      "연차",
-      "반가",
-      "오전반가",
-      "오후반가",
-      "annualleave",
-    ],
+    labels: ["연가", "연차", "반가", "오전반가", "오후반가", "annualleave"],
   },
   { type: "SICK_LEAVE", labels: ["병가", "질병휴가", "sickleave"] },
   { type: "OFFICIAL_LEAVE", labels: ["공가", "officialleave"] },
@@ -23,12 +16,7 @@ const EVENT_TYPE_SYNONYMS: Array<{
   },
   {
     type: "COMPASSIONATE_LEAVE",
-    labels: [
-      "청원휴가",
-      "경조휴가",
-      "가족돌봄휴가",
-      "compassionateleave",
-    ],
+    labels: ["청원휴가", "경조휴가", "가족돌봄휴가", "compassionateleave"],
   },
   { type: "OUTING", labels: ["외출", "개인외출", "outing"] },
   { type: "LATE_ARRIVAL", labels: ["지각", "late", "latearrival"] },
