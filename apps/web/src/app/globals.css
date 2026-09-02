@@ -2,16 +2,22 @@
 @import "./service-app.css";
 
 :root {
-  --navy: #071a3d;
-  --navy-muted: #49607f;
-  --teal: #00a68f;
-  --teal-deep: #008d7a;
-  --teal-pale: #e5f8f4;
-  --line: #d8e0ec;
-  --line-strong: #afbed2;
+  --navy: #0b1f3a;
+  --navy-muted: #5b6b7f;
+  --teal: #0c9b82;
+  --teal-deep: #087d6b;
+  --teal-pale: #e9f7f3;
+  --line: #e6e9ef;
+  --line-strong: #d6dce5;
   --surface: #ffffff;
-  --surface-muted: #f7fafc;
-  --danger: #bd2c41;
+  --surface-muted: #f2f4f6;
+  --surface-raised: #f8fafb;
+  --danger: #d14343;
+  --shadow-card: 0 8px 24px rgb(11 31 58 / 7%);
+  --shadow-floating: 0 10px 32px rgb(11 31 58 / 16%);
+  --radius-control: 14px;
+  --radius-card: 18px;
+  --radius-floating: 22px;
 }
 
 * {
@@ -27,7 +33,13 @@ body {
   margin: 0;
   background: var(--surface-muted);
   color: var(--navy);
-  font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-family:
+    "Pretendard Variable",
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Apple SD Gothic Neo",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -40,6 +52,7 @@ select {
 
 button {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:focus-visible,
