@@ -55,7 +55,7 @@ export function getCompensationPreview(
         suggestedMealRate: null,
         transportConfigured: profile.defaultCommuteCost !== null,
         message:
-          "첫·마지막 달 보수 산식은 검증이 끝나기 전까지 자동 계산하지 않아요.",
+          "첫 달과 마지막 달 계산 기준을 확인한 뒤 예상 보수를 제공할게요.",
         ruleVersion: gate.ruleVersion,
       };
     }
@@ -87,7 +87,7 @@ export function getCompensationPreview(
           : null,
       transportConfigured: transport.status === "SUPPORTED",
       message:
-        "중식비는 제안값 확인, 교통비는 통근비 입력 뒤에만 추정에 포함합니다.",
+        "1일 통근비와 중식비 제안값을 확인하면 예상 보수를 검토할 수 있어요.",
       ruleVersion: basePay.ruleVersion,
     };
   } catch {
@@ -96,7 +96,7 @@ export function getCompensationPreview(
       basePay: null,
       suggestedMealRate: null,
       transportConfigured: profile.defaultCommuteCost !== null,
-      message: `${calendarYear}년에는 적용 가능한 검증 보수 규칙이 없습니다.`,
+      message: `${calendarYear}년 검증 규칙이 준비되면 예상 보수를 제공할게요.`,
       ruleVersion: null,
     };
   }

@@ -8,8 +8,6 @@ import {
   Home,
   LockKeyhole,
   MapPin,
-  Pencil,
-  Plus,
   UserRound,
   WalletCards,
 } from "lucide-react";
@@ -44,6 +42,25 @@ import type {
 } from "@/lib/service-record-storage";
 
 type AppTab = "home" | "calendar" | "money" | "profile";
+
+const tabCopy: Record<AppTab, { title: string; description: string }> = {
+  home: {
+    title: "홈",
+    description: "오늘의 복무 현황을 확인해요.",
+  },
+  calendar: {
+    title: "캘린더",
+    description: "복무 일정 기록 기능을 준비하고 있어요.",
+  },
+  money: {
+    title: "보수",
+    description: "확인된 기준과 계산에 필요한 조건을 함께 보여드려요.",
+  },
+  profile: {
+    title: "내 정보",
+    description: "이 기기에 저장한 복무 설정을 관리해요.",
+  },
+};
 
 const currencyFormatter = new Intl.NumberFormat("ko-KR", {
   style: "currency",
@@ -203,10 +220,10 @@ function Onboarding({
   return (
     <main className="onboarding-shell">
       <section className="onboarding-panel" aria-labelledby="onboarding-title">
-        <p className="wordmark">SUPER GONGIK</p>
+        <p className="wordmark">슈퍼공익 · SUPER GONGIK</p>
         <h1 id="onboarding-title">복무 현황을 한눈에</h1>
         <p className="onboarding-intro">
-          회원가입 없이 기기에서 바로 시작해요.
+          회원가입 없이 이 기기에서 바로 시작해요.
         </p>
 
         {storageError ? (
@@ -263,7 +280,7 @@ function Onboarding({
           ) : null}
 
           <Button className="onboarding-submit" type="submit">
-            내 복무 시작하기
+            복무 현황 보기
           </Button>
         </form>
 
@@ -295,14 +312,47 @@ function Dashboard({
     entitlementDays: projection.annualLeaveDays,
     workdayMinutes: records.state.workdayMinutes,
   });
+  const activeCopy = tabCopy[activeTab];
 
   return (
     <main className="app-shell">
-      <header className="app-header">
-        <p className="wordmark">SUPER GONGIK</p>
+      <aside className="desktop-rail">
+        <p className="rail-wordmark">
+          SUPER
+          <br />
+          GONGIK
+        </p>
+        <span className="status-chip">
+          {serviceStateLabel(projection.progress.state)}
+        </span>
+        <nav aria-label="데스크톱 주요 메뉴" className="desktop-nav">
+          <TabButton
+            active={activeTab === "home"}
+            icon={Home}
+            label="홈"
+            onClick={() => setActiveTab("home")}
+          />
+          <TabButton
+            active={activeTab === "calendar"}
+            icon={CalendarDays}
+            label="캘린더"
+            onClick={() => setActiveTab("calendar")}
+          />
+          <TabButton
+            active={activeTab === "money"}
+            icon={WalletCards}
+            label="보수"
+            onClick={() => setActiveTab("money")}
+          />
+          <TabButton
+            active={activeTab === "profile"}
+            icon={UserRound}
+            label="내 정보"
+            onClick={() => setActiveTab("profile")}
+          />
+        </nav>
         <button
-          aria-label="내 정보 열기"
-          className="profile-context"
+          className="rail-profile"
           onClick={() => setActiveTab("profile")}
           type="button"
         >
@@ -312,45 +362,58 @@ function Dashboard({
             {Math.max(1, Math.ceil(projection.progress.elapsedDays / 30.44))}
             개월 차
           </span>
-          <Pencil aria-hidden="true" size={17} />
         </button>
-      </header>
+        <p className="rail-privacy">
+          <LockKeyhole aria-hidden="true" size={18} />
+          정보는 이 기기에만 저장해요.
+        </p>
+      </aside>
 
-      <section className="tab-content" aria-live="polite">
-        {activeTab === "home" ? (
-          <HomeTab
-            events={records.events}
-            leaveSummary={leaveSummary}
-            profile={profile}
-            projection={projection}
-            workdayMinutes={records.state.workdayMinutes}
-            onSelectTab={setActiveTab}
-          />
-        ) : null}
-        {activeTab === "calendar" ? (
-          <CalendarTab
-            entitlementDays={projection.annualLeaveDays}
-            events={records.events}
-            leaveSummary={leaveSummary}
-            workdayMinutes={records.state.workdayMinutes}
-          />
-        ) : null}
-        {activeTab === "money" ? <MoneyTab projection={projection} /> : null}
-        {activeTab === "profile" ? (
-          <ProfileTab
-            key={profile.updatedAt}
-            fingerprints={records.fingerprints}
-            imports={records.state.imports}
-            profile={profile}
-            workdayMinutes={records.state.workdayMinutes}
-            onCommitImport={records.commitImport}
-            onRollbackImport={records.rollbackImport}
-            onSetWorkdayMinutes={records.setWorkdayMinutes}
-            onSave={onSave}
-            onClear={onClear}
-          />
-        ) : null}
-      </section>
+      <div className="app-main">
+        <header className="app-header">
+          <p className="wordmark mobile-wordmark">SUPER GONGIK</p>
+          <div className="page-heading">
+            <h1>{activeCopy.title}</h1>
+            <p>{activeCopy.description}</p>
+          </div>
+        </header>
+
+        <section className="tab-content" aria-live="polite">
+          {activeTab === "home" ? (
+            <HomeTab
+              events={records.events}
+              leaveSummary={leaveSummary}
+              profile={profile}
+              projection={projection}
+              workdayMinutes={records.state.workdayMinutes}
+              onSelectTab={setActiveTab}
+            />
+          ) : null}
+          {activeTab === "calendar" ? (
+            <CalendarTab
+              entitlementDays={projection.annualLeaveDays}
+              events={records.events}
+              leaveSummary={leaveSummary}
+              workdayMinutes={records.state.workdayMinutes}
+            />
+          ) : null}
+          {activeTab === "money" ? <MoneyTab projection={projection} /> : null}
+          {activeTab === "profile" ? (
+            <ProfileTab
+              key={profile.updatedAt}
+              fingerprints={records.fingerprints}
+              imports={records.state.imports}
+              profile={profile}
+              workdayMinutes={records.state.workdayMinutes}
+              onCommitImport={records.commitImport}
+              onRollbackImport={records.rollbackImport}
+              onSetWorkdayMinutes={records.setWorkdayMinutes}
+              onSave={onSave}
+              onClear={onClear}
+            />
+          ) : null}
+        </section>
+      </div>
 
       <nav aria-label="주요 메뉴" className="tab-bar">
         <TabButton
@@ -413,7 +476,6 @@ function HomeTab({
   return (
     <>
       <section className="progress-hero" aria-labelledby="progress-title">
-        <ProgressRing percentage={progress.completionPercentage} />
         <div className="progress-copy">
           <p className="eyebrow" id="progress-title">
             소집해제까지
@@ -423,6 +485,11 @@ function HomeTab({
           <span className="progress-percentage">
             {progress.completionPercentage}%
           </span>
+        </div>
+        <ProgressRing percentage={progress.completionPercentage} />
+        <div className="progress-guidance">
+          <strong>차근차근, 잘하고 있어요.</strong>
+          <p>남은 기간도 건강하고 안전하게 복무를 마쳐요.</p>
         </div>
         <div className="progress-labels">
           <span>{progress.elapsedDays.toLocaleString("ko-KR")}일 복무</span>
@@ -451,22 +518,27 @@ function HomeTab({
         </article>
       </section>
 
-      <section className="dashboard-row" aria-label="이번 달 예상 보수">
+      <button
+        className="dashboard-row"
+        aria-label="보수 계산 조건 보기"
+        onClick={() => onSelectTab("money")}
+        type="button"
+      >
         <CircleDollarSign aria-hidden="true" size={29} />
         <div>
-          <h2>이번 달 예상 보수</h2>
+          <h2>보수 계산 조건 보기</h2>
           <p>{compensation.message}</p>
         </div>
-        <button
-          className="text-action"
-          onClick={() => onSelectTab("money")}
-          type="button"
-        >
-          보수 확인 <ChevronRight aria-hidden="true" size={18} />
-        </button>
-      </section>
+        <ChevronRight aria-hidden="true" className="row-arrow" size={22} />
+      </button>
 
-      <section className="next-event" aria-label="다음 일정">
+      <button
+        className="next-event"
+        aria-label="캘린더 보기"
+        onClick={() => onSelectTab("calendar")}
+        type="button"
+      >
+        <CalendarDays aria-hidden="true" size={29} />
         <div>
           <h2>다음 일정</h2>
           <p>
@@ -475,11 +547,8 @@ function HomeTab({
               : "등록된 일정이 없어요."}
           </p>
         </div>
-        <Button variant="outline" onClick={() => onSelectTab("calendar")}>
-          <Plus aria-hidden="true" size={20} />
-          기록 보기
-        </Button>
-      </section>
+        <ChevronRight aria-hidden="true" className="row-arrow" size={22} />
+      </button>
     </>
   );
 }
@@ -615,18 +684,13 @@ function MoneyTab({
   const { compensation } = projection;
 
   return (
-    <section className="money-page" aria-labelledby="money-title">
-      <h1 id="money-title">이번 달 예상 보수</h1>
-      <p className="section-intro">
-        공식 지급 결과와 다를 수 있는 추정값은 근거와 함께 표시합니다.
-      </p>
-
+    <section className="money-page" aria-label="이번 달 예상 보수 기준">
       <div className="money-list">
         <article>
           <span>기본 보수</span>
           <strong>
             {compensation.basePay === null
-              ? "계산 보류"
+              ? "기준 확인 중"
               : currencyFormatter.format(compensation.basePay)}
           </strong>
         </article>
@@ -634,7 +698,7 @@ function MoneyTab({
           <span>중식비</span>
           <strong>
             {compensation.suggestedMealRate === null
-              ? "확인 필요"
+              ? "프로필에서 확인하기"
               : `${currencyFormatter.format(compensation.suggestedMealRate)} / 일`}
           </strong>
           <p>2026년 제안값이며 프로필 확인 전에는 합계에 넣지 않습니다.</p>
@@ -644,7 +708,7 @@ function MoneyTab({
           <strong>
             {compensation.transportConfigured
               ? "통근비 입력됨"
-              : "통근비 입력 필요"}
+              : "1일 통근비 입력하기"}
           </strong>
           <p>전국 공통 금액으로 추정하지 않습니다.</p>
         </article>
@@ -666,8 +730,8 @@ function MoneyTab({
             <dt>상태</dt>
             <dd>
               {compensation.status === "GATED"
-                ? "자동 계산 보류"
-                : "입력 확인 필요"}
+                ? "검증 뒤 제공"
+                : "프로필 확인 필요"}
             </dd>
           </div>
         </dl>
@@ -749,12 +813,7 @@ function ProfileTab({
   }
 
   return (
-    <section className="profile-page" aria-labelledby="profile-title">
-      <h1 id="profile-title">내 정보</h1>
-      <p className="section-intro">
-        회원가입 없이 이 기기에 저장된 복무 설정입니다.
-      </p>
-
+    <section className="profile-page" aria-label="내 복무 정보">
       <form className="profile-form" onSubmit={handleSubmit}>
         <label className="form-field">
           <span>소집일</span>

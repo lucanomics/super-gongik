@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SUPER GONGIK",
-    short_name: "SUPER GONGIK",
+    name: "슈퍼공익 | SUPER GONGIK",
+    short_name: "슈퍼공익",
     description: "사회복무요원을 위한 개인 복무 관리 도구",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#071a3d",
+    theme_color: "#ffffff",
     lang: "ko",
     icons: [
       {

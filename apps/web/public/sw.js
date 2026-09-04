@@ -1,4 +1,4 @@
-const CACHE_NAME = "super-gongik-shell-v1";
+const CACHE_NAME = "super-gongik-shell-v2";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
