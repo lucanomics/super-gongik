@@ -2,7 +2,6 @@
 
 import {
   CalendarDays,
-  CalendarPlus,
   ChevronRight,
   CircleDollarSign,
   ClipboardList,
@@ -24,10 +23,23 @@ import {
   type DateOnly,
   type ServiceProfile,
 } from "@super-gongik/domain";
+import type { LeaveSnapshotCandidate } from "@super-gongik/importer";
 
+import { RecordImportPanel } from "@/components/record-import-panel";
 import { Button } from "@/components/ui/button";
 import { useServiceProfile } from "@/hooks/use-service-profile";
+import { useServiceRecords } from "@/hooks/use-service-records";
 import { getDashboardProjection } from "@/lib/dashboard-data";
+import {
+  formatLeaveMinutes,
+  formatPartialMinutes,
+  getAnnualLeaveSummary,
+  type AnnualLeaveSummary,
+} from "@/lib/leave-summary";
+import type {
+  StoredImportRecord,
+  StoredServiceEvent,
+} from "@/lib/service-record-storage";
 
 type AppTab = "home" | "calendar" | "money" | "profile";
 
@@ -56,6 +68,20 @@ const currencyFormatter = new Intl.NumberFormat("ko-KR", {
   maximumFractionDigits: 0,
 });
 
+const EVENT_LABELS: Record<StoredServiceEvent["eventType"], string> = {
+  ANNUAL_LEAVE: "연가",
+  SICK_LEAVE: "병가",
+  OFFICIAL_LEAVE: "공가",
+  SPECIAL_LEAVE: "특별휴가",
+  COMPASSIONATE_LEAVE: "청원/경조휴가",
+  OUTING: "외출",
+  LATE_ARRIVAL: "지각",
+  EARLY_LEAVE: "조퇴",
+  EDUCATION: "교육",
+  TRAINING: "훈련",
+  USER_NOTE: "기타 기록",
+};
+
 function createGuestMetadata() {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
@@ -74,6 +100,50 @@ function serviceStateLabel(state: "NOT_STARTED" | "IN_SERVICE" | "COMPLETED") {
     return "복무 완료";
   }
   return "복무 중";
+}
+
+function remainingAnnualLeaveLabel(
+  summary: AnnualLeaveSummary,
+  entitlementDays: number | null,
+  workdayMinutes: number | null,
+) {
+  const snapshot = summary.institutionSnapshot;
+  if (
+    snapshot?.remainingDays !== null &&
+    snapshot?.remainingDays !== undefined
+  ) {
+    const minutes = snapshot.remainingMinutes ?? 0;
+    return `${snapshot.remainingDays}일${minutes ? ` ${formatPartialMinutes(minutes)}` : ""}`;
+  }
+
+  if (summary.remainingMinutes !== null && workdayMinutes !== null) {
+    return formatLeaveMinutes(summary.remainingMinutes, workdayMinutes);
+  }
+
+  if (entitlementDays !== null && summary.partialMinutes === 0) {
+    return `${Math.max(0, entitlementDays - summary.fullDayEvents)}일`;
+  }
+
+  return "확인 필요";
+}
+
+function usedAnnualLeaveLabel(summary: AnnualLeaveSummary) {
+  const pieces: string[] = [];
+  if (summary.fullDayEvents) pieces.push(`전일 ${summary.fullDayEvents}일`);
+  if (summary.partialMinutes)
+    pieces.push(`부분 ${formatPartialMinutes(summary.partialMinutes)}`);
+  return pieces.length ? pieces.join(" + ") : "사용 기록 없음";
+}
+
+function eventDate(event: StoredServiceEvent) {
+  return event.startsAt.slice(0, 10) as DateOnly;
+}
+
+function eventDurationLabel(event: StoredServiceEvent) {
+  if (event.allDay && event.durationMinutes === null) return "전일";
+  if (event.durationMinutes !== null)
+    return formatPartialMinutes(event.durationMinutes);
+  return "시간 확인 필요";
 }
 
 export function ServiceApp() {
@@ -235,6 +305,13 @@ function Dashboard({
   const [activeTab, setActiveTab] = useState<AppTab>("home");
   const today = dateOnlyInTimeZone(new Date());
   const projection = getDashboardProjection(profile, today);
+  const records = useServiceRecords(profile.id);
+  const leaveSummary = getAnnualLeaveSummary({
+    events: records.events,
+    snapshots: records.snapshots,
+    entitlementDays: projection.annualLeaveDays,
+    workdayMinutes: records.state.workdayMinutes,
+  });
   const activeCopy = tabCopy[activeTab];
 
   return (
@@ -304,17 +381,33 @@ function Dashboard({
         <section className="tab-content" aria-live="polite">
           {activeTab === "home" ? (
             <HomeTab
+              events={records.events}
+              leaveSummary={leaveSummary}
               profile={profile}
               projection={projection}
+              workdayMinutes={records.state.workdayMinutes}
               onSelectTab={setActiveTab}
             />
           ) : null}
-          {activeTab === "calendar" ? <CalendarTab /> : null}
+          {activeTab === "calendar" ? (
+            <CalendarTab
+              entitlementDays={projection.annualLeaveDays}
+              events={records.events}
+              leaveSummary={leaveSummary}
+              workdayMinutes={records.state.workdayMinutes}
+            />
+          ) : null}
           {activeTab === "money" ? <MoneyTab projection={projection} /> : null}
           {activeTab === "profile" ? (
             <ProfileTab
               key={profile.updatedAt}
+              fingerprints={records.fingerprints}
+              imports={records.state.imports}
               profile={profile}
+              workdayMinutes={records.state.workdayMinutes}
+              onCommitImport={records.commitImport}
+              onRollbackImport={records.rollbackImport}
+              onSetWorkdayMinutes={records.setWorkdayMinutes}
               onSave={onSave}
               onClear={onClear}
             />
@@ -355,13 +448,20 @@ function Dashboard({
 function HomeTab({
   profile,
   projection,
+  events,
+  leaveSummary,
+  workdayMinutes,
   onSelectTab,
 }: {
   profile: ServiceProfile;
   projection: ReturnType<typeof getDashboardProjection>;
+  events: StoredServiceEvent[];
+  leaveSummary: AnnualLeaveSummary;
+  workdayMinutes: number | null;
   onSelectTab: (tab: AppTab) => void;
 }) {
   const { progress, annualLeaveDays, compensation } = projection;
+  const today = dateOnlyInTimeZone(new Date());
   const todayLabel = new Intl.DateTimeFormat("ko-KR", {
     year: "numeric",
     month: "long",
@@ -369,6 +469,9 @@ function HomeTab({
     weekday: "short",
     timeZone: "Asia/Seoul",
   }).format(new Date());
+  const nextEvent = [...events]
+    .filter((event) => eventDate(event) >= today)
+    .sort((a, b) => eventDate(a).localeCompare(eventDate(b)))[0];
 
   return (
     <>
@@ -404,8 +507,14 @@ function HomeTab({
         <article className="summary-card">
           <ClipboardList aria-hidden="true" size={28} />
           <h2>남은 연가</h2>
-          <strong>{annualLeaveDays ?? "—"}일</strong>
-          <p>일반 연가 {annualLeaveDays ?? "—"}일 중</p>
+          <strong>
+            {remainingAnnualLeaveLabel(
+              leaveSummary,
+              annualLeaveDays,
+              workdayMinutes,
+            )}
+          </strong>
+          <p>{usedAnnualLeaveLabel(leaveSummary)}</p>
         </article>
       </section>
 
@@ -429,10 +538,14 @@ function HomeTab({
         onClick={() => onSelectTab("calendar")}
         type="button"
       >
-        <CalendarPlus aria-hidden="true" size={29} />
+        <CalendarDays aria-hidden="true" size={29} />
         <div>
-          <h2>캘린더 보기</h2>
-          <p>일정 기록 기능을 준비하고 있어요.</p>
+          <h2>다음 일정</h2>
+          <p>
+            {nextEvent
+              ? `${formatKoreanDate(eventDate(nextEvent))} · ${EVENT_LABELS[nextEvent.eventType]}`
+              : "등록된 일정이 없어요."}
+          </p>
         </div>
         <ChevronRight aria-hidden="true" className="row-arrow" size={22} />
       </button>
@@ -480,13 +593,85 @@ function ProgressRing({ percentage }: { percentage: number }) {
   );
 }
 
-function CalendarTab() {
+function CalendarTab({
+  events,
+  leaveSummary,
+  entitlementDays,
+  workdayMinutes,
+}: {
+  events: StoredServiceEvent[];
+  leaveSummary: AnnualLeaveSummary;
+  entitlementDays: number | null;
+  workdayMinutes: number | null;
+}) {
+  const orderedEvents = [...events].sort((a, b) =>
+    b.startsAt.localeCompare(a.startsAt),
+  );
+
   return (
-    <section className="empty-state" aria-label="캘린더 준비 상태">
-      <CalendarPlus aria-hidden="true" size={42} />
-      <h2>일정을 한곳에서 관리할 수 있게 준비하고 있어요</h2>
-      <p>기능이 준비되면 복무 일정과 기록을 이 기기에 저장할 수 있어요.</p>
-      <p className="subtle">지금은 홈에서 복무 현황을 확인할 수 있어요.</p>
+    <section className="calendar-page" aria-labelledby="calendar-title">
+      <h1 id="calendar-title">복무 기록</h1>
+      <p className="section-intro">
+        직접 기록하거나 기관 파일에서 가져온 일정이 한곳에 모입니다.
+      </p>
+
+      <section className="leave-overview" aria-label="연가 사용 현황">
+        <div>
+          <span>현재 남은 연가</span>
+          <strong>
+            {remainingAnnualLeaveLabel(
+              leaveSummary,
+              entitlementDays,
+              workdayMinutes,
+            )}
+          </strong>
+        </div>
+        <div>
+          <span>확인된 사용</span>
+          <strong>{usedAnnualLeaveLabel(leaveSummary)}</strong>
+        </div>
+        {leaveSummary.institutionSnapshot ? (
+          <p>
+            기관 자료 기준일{" "}
+            {leaveSummary.institutionSnapshot.asOfDate ?? "미표기"}
+            {leaveSummary.discrepancyMinutes !== null &&
+            leaveSummary.discrepancyMinutes !== 0 &&
+            workdayMinutes !== null
+              ? ` · Super-Gongik 계산과 ${formatLeaveMinutes(Math.abs(leaveSummary.discrepancyMinutes), workdayMinutes)} 차이`
+              : ""}
+          </p>
+        ) : null}
+      </section>
+
+      {orderedEvents.length ? (
+        <div className="agenda-list">
+          {orderedEvents.map((event) => (
+            <article key={event.id}>
+              <time dateTime={eventDate(event)}>
+                {formatKoreanDate(eventDate(event))}
+              </time>
+              <div>
+                <strong>{EVENT_LABELS[event.eventType]}</strong>
+                <p>
+                  {eventDurationLabel(event)}
+                  {event.note ? ` · ${event.note}` : ""}
+                </p>
+              </div>
+              {event.metadata.importSourceFileName ? (
+                <span>파일</span>
+              ) : (
+                <span>직접</span>
+              )}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <section className="empty-state empty-state--compact">
+          <CalendarDays aria-hidden="true" size={42} />
+          <h2>아직 복무 기록이 없어요.</h2>
+          <p>내 정보에서 기관 CSV, XLSX 또는 PDF를 가져올 수 있습니다.</p>
+        </section>
+      )}
     </section>
   );
 }
@@ -557,10 +742,25 @@ function MoneyTab({
 
 function ProfileTab({
   profile,
+  fingerprints,
+  imports,
+  workdayMinutes,
+  onCommitImport,
+  onRollbackImport,
+  onSetWorkdayMinutes,
   onSave,
   onClear,
 }: {
   profile: ServiceProfile;
+  fingerprints: ReadonlySet<string>;
+  imports: StoredImportRecord[];
+  workdayMinutes: number | null;
+  onCommitImport: (
+    plan: Parameters<ReturnType<typeof useServiceRecords>["commitImport"]>[0],
+    snapshots: LeaveSnapshotCandidate[],
+  ) => void;
+  onRollbackImport: (batchId: string) => void;
+  onSetWorkdayMinutes: (minutes: number | null) => void;
   onSave: (profile: ServiceProfile) => void;
   onClear: () => void;
 }) {
@@ -663,6 +863,15 @@ function ProfileTab({
         ) : null}
         <Button type="submit">변경 사항 저장</Button>
       </form>
+
+      <RecordImportPanel
+        fingerprints={fingerprints}
+        imports={imports}
+        workdayMinutes={workdayMinutes}
+        onCommit={onCommitImport}
+        onRollback={onRollbackImport}
+        onSetWorkdayMinutes={onSetWorkdayMinutes}
+      />
 
       <section className="profile-security">
         <LockKeyhole aria-hidden="true" size={24} />

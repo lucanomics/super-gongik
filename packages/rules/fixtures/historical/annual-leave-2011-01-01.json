@@ -1,0 +1,99 @@
+{
+  "fixtureId": "kr.mma.public-service.annual-leave-allocation.2011-01-01-reference",
+  "productionSelectable": false,
+  "requiresPrimarySourceReverification": true,
+  "sourceDocument": {
+    "title": "행정관서요원의 복무기간별 연가일수(제39조의2 관련)",
+    "documentLabel": "연가일수(20110101)",
+    "format": "HWP",
+    "applicabilityText": "소집일자가 2011.1.1. 이후인 공익근무요원",
+    "historicalTerminology": "공익근무요원"
+  },
+  "effectiveFromReference": "2011-01-01",
+  "effectiveUntil": null,
+  "allocations": [
+    {
+      "mandatoryServiceMonths": 24,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 16,
+      "ordinaryTotalDays": 31
+    },
+    {
+      "mandatoryServiceMonths": 23,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 15,
+      "ordinaryTotalDays": 30
+    },
+    {
+      "mandatoryServiceMonths": 22,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 14,
+      "ordinaryTotalDays": 29
+    },
+    {
+      "mandatoryServiceMonths": 21,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 13,
+      "ordinaryTotalDays": 28
+    },
+    {
+      "mandatoryServiceMonths": 20,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 12,
+      "ordinaryTotalDays": 27
+    },
+    {
+      "mandatoryServiceMonths": 19,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 10,
+      "ordinaryTotalDays": 25
+    },
+    {
+      "mandatoryServiceMonths": 18,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 9,
+      "ordinaryTotalDays": 24
+    },
+    {
+      "mandatoryServiceMonths": 17,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 8,
+      "ordinaryTotalDays": 23
+    },
+    {
+      "mandatoryServiceMonths": 16,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 6,
+      "ordinaryTotalDays": 21
+    },
+    {
+      "mandatoryServiceMonths": 15,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 5,
+      "ordinaryTotalDays": 20
+    },
+    {
+      "mandatoryServiceMonths": 14,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 4,
+      "ordinaryTotalDays": 19
+    },
+    {
+      "mandatoryServiceMonths": 13,
+      "firstYearDays": 15,
+      "afterFirstYearDays": 2,
+      "ordinaryTotalDays": 17
+    },
+    { "mandatoryServiceMonths": 12, "wholeServiceDays": 16 },
+    { "mandatoryServiceMonths": 11, "wholeServiceDays": 15 },
+    { "mandatoryServiceMonths": 10, "wholeServiceDays": 13 },
+    { "mandatoryServiceMonths": 9, "wholeServiceDays": 12 },
+    { "mandatoryServiceMonths": 8, "wholeServiceDays": 11 },
+    { "mandatoryServiceMonths": 7, "wholeServiceDays": 9 },
+    { "mandatoryServiceMonths": 6, "wholeServiceDays": 8 },
+    { "mandatoryServiceMonths": 5, "wholeServiceDays": 7 },
+    { "mandatoryServiceMonths": 4, "wholeServiceDays": 5 },
+    { "mandatoryServiceMonths": 3, "wholeServiceDays": 4 }
+  ],
+  "safetyNote": "Historical development reference only. Do not select this fixture for current entitlement calculations without confirming the applicable current primary source and effective period."
+}
